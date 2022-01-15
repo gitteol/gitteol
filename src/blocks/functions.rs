@@ -5,7 +5,12 @@ use crate::{code::Memory, Id};
 use super::{BlockReturn, Value};
 
 type Args = [Value];
-pub(crate) fn move_direction(pointer: usize, args: &Args, memory: &Memory, translation: &mut Vec3) -> BlockReturn {
+pub(crate) fn move_direction(
+    pointer: usize,
+    args: &Args,
+    memory: &Memory,
+    translation: &mut Vec3,
+) -> BlockReturn {
     let amount = match args[0].memory(memory) {
         Some(i) => i.number(),
         None => args[0].number(),
@@ -31,9 +36,8 @@ pub(crate) fn repeat_basic(
         None => args[0].number(),
     }
     .unwrap();
-    let memory_key = format!("{}_count", block_id.0);
     let count = memory
-        .entry(memory_key.clone())
+        .entry(block_id, "count")
         .or_insert(Value::Number(0.0))
         .number_mut()
         .unwrap();
@@ -45,7 +49,7 @@ pub(crate) fn repeat_basic(
             return_value: None,
         }
     } else {
-        memory.remove(&memory_key);
+        memory.remove(block_id, "count");
         BlockReturn {
             pointer: pointer + (args[1].number().unwrap() as usize) + 2,
             is_continue: false,

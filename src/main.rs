@@ -43,7 +43,10 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>, mut events: Eve
                 Block {
                     id: Id("c5q1".to_string()),
                     block_type: BlockType::RepeatBasic,
-                    args: vec![Value::Memory("c5q3".to_string()), Value::Number(1.0)],
+                    args: vec![
+                        Value::Memory((Id("c5q3".to_string()), "return_value".to_string())),
+                        Value::Number(1.0),
+                    ],
                 },
                 Block {
                     id: Id("niob".to_string()),
@@ -54,11 +57,6 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>, mut events: Eve
                     id: Id("c5q1".to_string()),
                     block_type: BlockType::RepeatBasicEnd,
                     args: vec![Value::Number(1.0)],
-                },
-                Block {
-                    id: Id("niob".to_string()),
-                    block_type: BlockType::MoveDirection,
-                    args: vec![Value::Number(-100.0)],
                 },
             ],
         });

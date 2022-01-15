@@ -15,7 +15,38 @@ pub(crate) struct Code {
     pub(crate) blocks: Vec<Block>,
 }
 
-pub(crate) type Memory = HashMap<String, Value>;
+#[derive(Debug)]
+pub(crate) struct Memory(HashMap<String, Value>);
+impl Memory {
+    fn new() -> Self {
+        Memory(HashMap::new())
+    }
+
+    fn format_key(block_id: &Id, label: &str) -> String {
+        format!("{}_{}", block_id.0, label)
+    }
+
+    pub(crate) fn insert(&mut self, block_id: &Id, label: &str, value: Value) -> Option<Value> {
+        self.0.insert(Self::format_key(block_id, label), value)
+    }
+
+    pub(crate) fn get(&self, block_id: &Id, label: &str) -> Option<&Value> {
+        self.0.get(&Self::format_key(block_id, label))
+    }
+
+    pub(crate) fn entry(
+        &mut self,
+        block_id: &Id,
+        label: &str,
+    ) -> std::collections::hash_map::Entry<String, Value> {
+        self.0.entry(Self::format_key(block_id, label))
+    }
+
+    pub(crate) fn remove(&mut self, block_id: &Id, label: &str) -> Option<Value> {
+        self.0.remove(&Self::format_key(block_id, label))
+    }
+}
+
 pub(crate) struct CodeRunner {
     code: Vec<Block>,
     pointer: usize,
@@ -28,7 +59,7 @@ impl CodeRunner {
             code,
             pointer: 0,
             owner,
-            memory: HashMap::new(),
+            memory: Memory::new(),
         }
     }
 }
@@ -53,9 +84,12 @@ pub(crate) fn execute_code(
 
         while let Some(block) = code.get_mut(pointer) {
             let block_return = match block.block_type {
-                BlockType::MoveDirection => {
-                    functions::move_direction(pointer, &block.args, &memory, &mut transform.translation)
-                }
+                BlockType::MoveDirection => functions::move_direction(
+                    pointer,
+                    &block.args,
+                    &memory,
+                    &mut transform.translation,
+                ),
                 BlockType::RepeatBasic => {
                     functions::repeat_basic(pointer, &block.args, &block.id, &mut memory)
                 }
@@ -64,7 +98,7 @@ pub(crate) fn execute_code(
             };
             pointer = block_return.pointer;
             if let Some(return_value) = block_return.return_value {
-                memory.insert(block.id.0.clone(), return_value);
+                memory.insert(&block.id, "return_value", return_value);
             }
             info!("pointer: {}, memory: {:?}", pointer, memory);
             if block_return.is_continue {

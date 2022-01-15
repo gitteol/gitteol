@@ -15,7 +15,7 @@ pub(crate) enum Value {
     String(String),
     Number(f32),
     Boolean(bool),
-    Memory(String),
+    Memory((Id, String)),
 }
 impl Value {
     fn string(&self) -> Option<&str> {
@@ -44,7 +44,7 @@ impl Value {
     }
     fn memory<'a>(&self, memory: &'a Memory) -> Option<&'a Value> {
         match self {
-            Self::Memory(val) => memory.get(val),
+            Self::Memory((id, label)) => memory.get(id, label),
             _ => None,
         }
     }
