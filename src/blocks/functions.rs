@@ -5,6 +5,7 @@ use crate::{code::Memory, Id};
 use super::{BlockReturn, Value};
 
 type Args = [Value];
+
 pub(crate) fn move_direction(
     pointer: usize,
     args: &Args,
@@ -22,6 +23,43 @@ pub(crate) fn move_direction(
         pointer: pointer + 1,
         is_continue: false,
         return_value: None,
+    }
+}
+
+pub(crate) fn wait_second(
+    pointer: usize,
+    args: &Args,
+    block_id: &Id,
+    memory: &mut Memory,
+    time: &Res<Time>,
+) -> BlockReturn {
+    let second = match args[0].memory(memory) {
+        Some(i) => i.number(),
+        None => args[0].number(),
+    }
+    .unwrap();
+
+    let delta = memory
+        .entry(block_id, "delta")
+        .or_insert(Value::Number(0.0))
+        .number_mut()
+        .unwrap();
+
+    *delta += time.delta_seconds();
+
+    if *delta >= second {
+        memory.remove(block_id, "delta");
+        BlockReturn {
+            pointer: pointer + 1,
+            is_continue: false,
+            return_value: None,
+        }
+    } else {
+        BlockReturn {
+            pointer,
+            is_continue: true,
+            return_value: None,
+        }
     }
 }
 

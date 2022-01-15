@@ -45,7 +45,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>, mut events: Eve
                     block_type: BlockType::RepeatBasic,
                     args: vec![
                         Value::Memory((Id("c5q3".to_string()), "return_value".to_string())),
-                        Value::Number(1.0),
+                        Value::Number(2.0),
                     ],
                 },
                 Block {
@@ -54,9 +54,14 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>, mut events: Eve
                     args: vec![Value::Number(10.0)],
                 },
                 Block {
+                    id: Id("nioc".to_string()),
+                    block_type: BlockType::WaitSecond,
+                    args: vec![Value::Number(0.5)],
+                },
+                Block {
                     id: Id("c5q1".to_string()),
                     block_type: BlockType::RepeatBasicEnd,
-                    args: vec![Value::Number(1.0)],
+                    args: vec![Value::Number(2.0)],
                 },
             ],
         });

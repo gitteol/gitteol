@@ -68,6 +68,7 @@ pub(crate) struct Queue(pub(crate) VecDeque<CodeRunner>);
 
 pub(crate) fn execute_code(
     mut queue: ResMut<Queue>,
+    time: Res<Time>,
     mut transforms: Query<(&mut Transform, &Id), With<Object>>,
 ) {
     let mut new_queue: VecDeque<CodeRunner> = VecDeque::new();
@@ -95,6 +96,9 @@ pub(crate) fn execute_code(
                 }
                 BlockType::RepeatBasicEnd => functions::repeat_basic_end(pointer, &block.args),
                 BlockType::LengthOfString => functions::length_of_string(pointer, &block.args),
+                BlockType::WaitSecond => {
+                    functions::wait_second(pointer, &block.args, &block.id, &mut memory, &time)
+                }
             };
             pointer = block_return.pointer;
             if let Some(return_value) = block_return.return_value {

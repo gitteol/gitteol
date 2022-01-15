@@ -5,6 +5,7 @@ pub(crate) mod functions;
 #[derive(Clone, Debug)]
 pub(crate) enum BlockType {
     MoveDirection,
+    WaitSecond,
     RepeatBasic,
     RepeatBasicEnd,
     LengthOfString,
