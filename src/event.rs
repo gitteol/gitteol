@@ -24,10 +24,8 @@ pub(crate) fn event_listener(
     code.iter()
         .filter(|(Code { event: e, .. }, _)| events.contains(&e))
         .for_each(|(code, id)| {
-            queue.0.push_back(CodeRunner {
-                code: code.blocks.clone(),
-                pointer: 0,
-                owner: id.clone(),
-            })
+            queue
+                .0
+                .push_back(CodeRunner::new(code.blocks.clone(), id.clone()))
         });
 }

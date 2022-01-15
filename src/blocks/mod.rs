@@ -1,11 +1,13 @@
+use crate::{code::Memory, Id};
+
 pub(crate) mod functions;
-pub(crate) mod state;
 
 #[derive(Clone, Debug)]
 pub(crate) enum BlockType {
     MoveDirection,
     RepeatBasic,
     RepeatBasicEnd,
+    LengthOfString,
 }
 
 #[derive(Clone, Debug)]
@@ -13,6 +15,7 @@ pub(crate) enum Value {
     String(String),
     Number(f32),
     Boolean(bool),
+    Memory(String),
 }
 impl Value {
     fn string(&self) -> Option<&str> {
@@ -27,9 +30,21 @@ impl Value {
             _ => None,
         }
     }
+    fn number_mut(&mut self) -> Option<&mut f32> {
+        match self {
+            Self::Number(val) => Some(val),
+            _ => None,
+        }
+    }
     fn boolean(&self) -> Option<bool> {
         match self {
             Self::Boolean(val) => Some(*val),
+            _ => None,
+        }
+    }
+    fn memory<'a>(&self, memory: &'a Memory) -> Option<&'a Value> {
+        match self {
+            Self::Memory(val) => memory.get(val),
             _ => None,
         }
     }
@@ -37,12 +52,13 @@ impl Value {
 
 #[derive(Clone, Debug)]
 pub(crate) struct Block {
+    pub(crate) id: Id,
     pub(crate) block_type: BlockType,
     pub(crate) args: Vec<Value>,
-    pub(crate) state: state::BlockState,
 }
 
 pub(crate) struct BlockReturn {
     pub(crate) pointer: usize,
     pub(crate) is_continue: bool,
+    pub(crate) return_value: Option<Value>,
 }

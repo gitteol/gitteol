@@ -7,15 +7,12 @@ mod code;
 mod event;
 mod object;
 
-use blocks::{
-    state::{BlockState, RepeatEndState, RepeatState},
-    Block, BlockType, Value,
-};
+use blocks::{Block, BlockType, Value};
 use code::{Code, Queue};
 use event::{Event, EventType};
 use object::{Object, ObjectType};
 
-#[derive(Component, Debug, Clone, PartialEq, Eq)]
+#[derive(Component, Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Id(String);
 
 fn setup(mut commands: Commands, asset_server: Res<AssetServer>, mut events: EventWriter<Event>) {
@@ -39,22 +36,29 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>, mut events: Eve
             event: EventType::WhenRunButtonClick,
             blocks: vec![
                 Block {
-                    block_type: BlockType::RepeatBasic,
-                    args: vec![Value::Number(10.0)],
-                    state: BlockState::RepeatBasic(RepeatState {
-                        length: 1,
-                        ..Default::default()
-                    }),
+                    id: Id("c5q3".to_string()),
+                    block_type: BlockType::LengthOfString,
+                    args: vec![Value::String("안녕, 엔트리!".to_string())],
                 },
                 Block {
+                    id: Id("c5q1".to_string()),
+                    block_type: BlockType::RepeatBasic,
+                    args: vec![Value::Memory("c5q3".to_string()), Value::Number(1.0)],
+                },
+                Block {
+                    id: Id("niob".to_string()),
                     block_type: BlockType::MoveDirection,
                     args: vec![Value::Number(10.0)],
-                    state: BlockState::None,
                 },
                 Block {
+                    id: Id("c5q1".to_string()),
                     block_type: BlockType::RepeatBasicEnd,
-                    args: vec![],
-                    state: BlockState::RepeatBasicEnd(RepeatEndState { length: 1 }),
+                    args: vec![Value::Number(1.0)],
+                },
+                Block {
+                    id: Id("niob".to_string()),
+                    block_type: BlockType::MoveDirection,
+                    args: vec![Value::Number(-100.0)],
                 },
             ],
         });
