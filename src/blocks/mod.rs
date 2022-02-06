@@ -21,22 +21,26 @@ pub(crate) enum Value {
     Memory((Id, String)),
 }
 impl Value {
-    fn string(&self) -> Option<&str> {
+    fn string(&self) -> Result<String, &str> {
         match self {
-            Self::String(val) => Some(&val[..]),
-            _ => None,
+            Self::String(val) => Ok(val.to_string()),
+            Self::Number(val) => Ok(val.to_string()),
+            Self::Boolean(val) => Ok(val.to_string()),
+            _ => Err("cannot convert as string"),
         }
     }
-    fn number(&self) -> Option<f32> {
+    fn number(&self) -> Result<f32, &str> {
         match self {
-            Self::Number(val) => Some(*val),
-            _ => None,
+            Self::Number(val) => Ok(*val),
+            Self::String(val) => val.parse::<f32>().or(Err("cannot convert as number")),
+            Self::Boolean(val) => Ok(if *val { 1.0 } else { 0.0 }),
+            _ => Err("cannot convert as number"),
         }
     }
-    fn number_mut(&mut self) -> Option<&mut f32> {
+    fn number_mut(&mut self) -> Result<&mut f32, &str> {
         match self {
-            Self::Number(val) => Some(val),
-            _ => None,
+            Self::Number(val) => Ok(val),
+            _ => Err("cannot convert as mutable number"),
         }
     }
     fn boolean(&self) -> Option<bool> {
@@ -45,11 +49,12 @@ impl Value {
             _ => None,
         }
     }
-    fn memory<'a>(&self, memory: &'a Memory) -> Option<&'a Value> {
-        match self {
-            Self::Memory((id, label)) => memory.get(id, label),
-            _ => None,
+    fn to_raw_value<'a>(&'a self, memory: &'a Memory) -> Option<&'a Value> {
+        let mut value = Some(self);
+        while let Some(Value::Memory((id, label))) = value {
+            value = memory.get(id, label);
         }
+        value
     }
 }
 

@@ -49,11 +49,16 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>, mut events: Eve
             event: EventType::WhenRunButtonClick,
             blocks: vec![
                 Block {
+                    id: Id("ai3d".to_string()),
+                    block_type: BlockType::WaitSecond,
+                    args: vec![Value::Number(2.0)],
+                },
+                Block {
                     id: Id("niod".to_string()),
                     block_type: BlockType::SetVariable,
                     args: vec![
                         Value::String("ie7y".to_string()),
-                        Value::String("안녕!".to_string()),
+                        Value::String("20".to_string()),
                     ],
                 },
                 Block {
@@ -62,18 +67,10 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>, mut events: Eve
                     args: vec![Value::String("ie7y".to_string())],
                 },
                 Block {
-                    id: Id("c5q3".to_string()),
-                    block_type: BlockType::LengthOfString,
-                    args: vec![Value::Memory((
-                        Id("15qa".to_string()),
-                        "return_value".to_string(),
-                    ))],
-                },
-                Block {
                     id: Id("c5q1".to_string()),
                     block_type: BlockType::RepeatBasic,
                     args: vec![
-                        Value::Memory((Id("c5q3".to_string()), "return_value".to_string())),
+                        Value::Memory((Id("15qa".to_string()), "return_value".to_string())),
                         Value::Number(2.0),
                     ],
                 },

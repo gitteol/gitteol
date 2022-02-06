@@ -12,11 +12,7 @@ pub(crate) fn move_direction(
     memory: &Memory,
     translation: &mut Vec3,
 ) -> BlockReturn {
-    let amount = match args[0].memory(memory) {
-        Some(i) => i.number(),
-        None => args[0].number(),
-    }
-    .unwrap();
+    let amount = args[0].to_raw_value(memory).unwrap().number().unwrap();
     translation.x += amount;
 
     BlockReturn {
@@ -33,11 +29,7 @@ pub(crate) fn wait_second(
     memory: &mut Memory,
     time: &Res<Time>,
 ) -> BlockReturn {
-    let second = match args[0].memory(memory) {
-        Some(i) => i.number(),
-        None => args[0].number(),
-    }
-    .unwrap();
+    let second = args[0].to_raw_value(memory).unwrap().number().unwrap();
 
     let delta = memory
         .entry(block_id, "delta")
@@ -69,11 +61,7 @@ pub(crate) fn repeat_basic(
     block_id: &Id,
     memory: &mut Memory,
 ) -> BlockReturn {
-    let iter_num = match args[0].memory(memory) {
-        Some(i) => i.number(),
-        None => args[0].number(),
-    }
-    .unwrap();
+    let iter_num = args[0].to_raw_value(memory).unwrap().number().unwrap();
     let count = memory
         .entry(block_id, "count")
         .or_insert(Value::Number(0.0))
@@ -106,13 +94,13 @@ pub(crate) fn repeat_basic_end(pointer: usize, args: &Args) -> BlockReturn {
 }
 
 pub(crate) fn length_of_string(pointer: usize, args: &Args, memory: &Memory) -> BlockReturn {
-    let length = match args[0].memory(memory) {
-        Some(i) => i.string(),
-        None => args[0].string(),
-    }
-    .unwrap()
-    .chars()
-    .count();
+    let length = args[0]
+        .to_raw_value(memory)
+        .unwrap()
+        .string()
+        .unwrap()
+        .chars()
+        .count();
 
     BlockReturn {
         pointer: pointer + 1,
@@ -128,7 +116,7 @@ pub(crate) fn set_variable(
     variables: &mut Query<&mut Variable>,
 ) -> BlockReturn {
     let variable_id = args[0].string().unwrap();
-    let value = args[1].string().unwrap();
+    let value = args[1].to_raw_value(memory).unwrap().string().unwrap();
 
     let mut variable = variables
         .iter_mut()
