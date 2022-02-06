@@ -9,6 +9,8 @@ pub(crate) enum BlockType {
     RepeatBasic,
     RepeatBasicEnd,
     LengthOfString,
+    SetVariable,
+    GetVariable,
 }
 
 #[derive(Clone, Debug)]

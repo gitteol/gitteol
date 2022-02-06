@@ -6,6 +6,7 @@ use crate::{
     blocks::{functions, Block, BlockType, Value},
     event::EventType,
     object::Object,
+    variable::Variable,
     Id,
 };
 
@@ -70,6 +71,7 @@ pub(crate) fn execute_code(
     mut queue: ResMut<Queue>,
     time: Res<Time>,
     mut transforms: Query<(&mut Transform, &Id), With<Object>>,
+    mut variables: Query<&mut Variable>,
 ) {
     let mut new_queue: VecDeque<CodeRunner> = VecDeque::new();
 
@@ -95,9 +97,17 @@ pub(crate) fn execute_code(
                     functions::repeat_basic(pointer, &block.args, &block.id, &mut memory)
                 }
                 BlockType::RepeatBasicEnd => functions::repeat_basic_end(pointer, &block.args),
-                BlockType::LengthOfString => functions::length_of_string(pointer, &block.args),
+                BlockType::LengthOfString => {
+                    functions::length_of_string(pointer, &block.args, &memory)
+                }
                 BlockType::WaitSecond => {
                     functions::wait_second(pointer, &block.args, &block.id, &mut memory, &time)
+                }
+                BlockType::SetVariable => {
+                    functions::set_variable(pointer, &block.args, &memory, &mut variables)
+                }
+                BlockType::GetVariable => {
+                    functions::get_variable(pointer, &block.args, &memory, &variables)
                 }
             };
             pointer = block_return.pointer;

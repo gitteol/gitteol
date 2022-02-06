@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::{code::Memory, Id};
+use crate::{code::Memory, variable::Variable, Id};
 
 use super::{BlockReturn, Value};
 
@@ -105,12 +105,59 @@ pub(crate) fn repeat_basic_end(pointer: usize, args: &Args) -> BlockReturn {
     }
 }
 
-pub(crate) fn length_of_string(pointer: usize, args: &Args) -> BlockReturn {
-    let length = args[0].string().unwrap().chars().count();
+pub(crate) fn length_of_string(pointer: usize, args: &Args, memory: &Memory) -> BlockReturn {
+    let length = match args[0].memory(memory) {
+        Some(i) => i.string(),
+        None => args[0].string(),
+    }
+    .unwrap()
+    .chars()
+    .count();
 
     BlockReturn {
         pointer: pointer + 1,
         is_continue: false,
         return_value: Some(Value::Number(length as f32)),
+    }
+}
+
+pub(crate) fn set_variable(
+    pointer: usize,
+    args: &Args,
+    memory: &Memory,
+    variables: &mut Query<&mut Variable>,
+) -> BlockReturn {
+    let variable_id = args[0].string().unwrap();
+    let value = args[1].string().unwrap();
+
+    let mut variable = variables
+        .iter_mut()
+        .find(|variable| variable.id.0 == variable_id)
+        .unwrap();
+    variable.value = value.to_string();
+
+    BlockReturn {
+        pointer: pointer + 1,
+        is_continue: false,
+        return_value: None,
+    }
+}
+
+pub(crate) fn get_variable(
+    pointer: usize,
+    args: &Args,
+    memory: &Memory,
+    variables: &Query<&mut Variable>,
+) -> BlockReturn {
+    let variable_id = args[0].string().unwrap();
+
+    let variable = variables
+        .iter()
+        .find(|variable| variable.id.0 == variable_id)
+        .unwrap();
+    BlockReturn {
+        pointer: pointer + 1,
+        is_continue: false,
+        return_value: Some(Value::String(variable.value.clone())),
     }
 }
