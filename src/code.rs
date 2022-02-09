@@ -93,10 +93,14 @@ pub(crate) fn execute_code(
                     &memory,
                     &mut transform.translation,
                 ),
-                BlockType::RepeatBasic => {
-                    functions::repeat_basic(pointer, &block.args, &block.id, &mut memory)
-                }
-                BlockType::RepeatBasicEnd => functions::repeat_basic_end(pointer, &block.args),
+                BlockType::RepeatBasic => functions::repeat_basic(
+                    pointer,
+                    &block.args,
+                    &block.extra,
+                    &block.id,
+                    &mut memory,
+                ),
+                BlockType::RepeatBasicEnd => functions::repeat_basic_end(pointer, &block.extra),
                 BlockType::LengthOfString => {
                     functions::length_of_string(pointer, &block.args, &memory)
                 }

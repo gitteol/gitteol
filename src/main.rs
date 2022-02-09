@@ -17,6 +17,12 @@ use variable::{spawn_variable, Variable, VariableType};
 #[derive(Component, Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Id(String);
 
+impl Id {
+    fn from_str(id: &str) -> Id {
+        Id(id.to_string())
+    }
+}
+
 #[derive(Component, Clone)]
 struct LocalPos(f32, f32);
 impl LocalPos {
@@ -43,46 +49,52 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>, mut events: Eve
             ..Default::default()
         })
         .insert(Object)
-        .insert(Id("tund".to_string()))
+        .insert(Id::from_str("tund"))
         .insert(ObjectType::Sprite)
         .insert(Code {
             event: EventType::WhenRunButtonClick,
             blocks: vec![
                 Block {
-                    id: Id("ai3d".to_string()),
+                    id: Id::from_str("ai3d"),
                     block_type: BlockType::WaitSecond,
                     args: vec![Value::Number(2.0)],
+                    extra: vec![],
                 },
                 Block {
-                    id: Id("niod".to_string()),
+                    id: Id::from_str("niod"),
                     block_type: BlockType::SetVariable,
                     args: vec![
                         Value::String("ie7y".to_string()),
                         Value::String("20".to_string()),
                     ],
+                    extra: vec![],
                 },
                 Block {
-                    id: Id("15qa".to_string()),
+                    id: Id::from_str("15qa"),
                     block_type: BlockType::GetVariable,
                     args: vec![Value::String("ie7y".to_string())],
+                    extra: vec![],
                 },
                 Block {
-                    id: Id("c5q1".to_string()),
+                    id: Id::from_str("c5q1"),
                     block_type: BlockType::RepeatBasic,
-                    args: vec![
-                        Value::Memory((Id("15qa".to_string()), "return_value".to_string())),
-                        Value::Number(2.0),
-                    ],
+                    args: vec![Value::Memory((
+                        Id::from_str("15qa"),
+                        "return_value".to_string(),
+                    ))],
+                    extra: vec![Value::Number(2.0)],
                 },
                 Block {
-                    id: Id("niob".to_string()),
+                    id: Id::from_str("niob"),
                     block_type: BlockType::MoveDirection,
                     args: vec![Value::Number(10.0)],
+                    extra: vec![],
                 },
                 Block {
-                    id: Id("c5q1".to_string()),
+                    id: Id::from_str("c5q1"),
                     block_type: BlockType::RepeatBasicEnd,
-                    args: vec![Value::Number(2.0)],
+                    args: vec![],
+                    extra: vec![Value::Number(2.0)],
                 },
             ],
         });
@@ -103,7 +115,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>, mut events: Eve
         font,
         parent_ui,
         Variable {
-            id: Id("ie7y".to_string()),
+            id: Id::from_str("ie7y"),
             variable_type: VariableType::Normal,
             name: "변수2".to_string(),
             value: "014".to_string(),

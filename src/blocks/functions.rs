@@ -12,14 +12,10 @@ pub(crate) fn move_direction(
     memory: &Memory,
     translation: &mut Vec3,
 ) -> BlockReturn {
-    let amount = args[0].to_raw_value(memory).unwrap().number().unwrap();
+    let amount = args[0].to_raw_value(memory).unwrap().as_number().unwrap();
     translation.x += amount;
 
-    BlockReturn {
-        pointer: pointer + 1,
-        is_continue: false,
-        return_value: None,
-    }
+    BlockReturn::basic(pointer)
 }
 
 pub(crate) fn wait_second(
@@ -29,12 +25,12 @@ pub(crate) fn wait_second(
     memory: &mut Memory,
     time: &Res<Time>,
 ) -> BlockReturn {
-    let second = args[0].to_raw_value(memory).unwrap().number().unwrap();
+    let second = args[0].to_raw_value(memory).unwrap().as_number().unwrap();
 
     let delta = memory
         .entry(block_id, "delta")
         .or_insert(Value::Number(0.0))
-        .number_mut()
+        .as_number_mut()
         .unwrap();
 
     *delta += time.delta_seconds();
@@ -58,14 +54,15 @@ pub(crate) fn wait_second(
 pub(crate) fn repeat_basic(
     pointer: usize,
     args: &Args,
+    extra: &Args,
     block_id: &Id,
     memory: &mut Memory,
 ) -> BlockReturn {
-    let iter_num = args[0].to_raw_value(memory).unwrap().number().unwrap();
+    let iter_num = args[0].to_raw_value(memory).unwrap().as_number().unwrap();
     let count = memory
         .entry(block_id, "count")
         .or_insert(Value::Number(0.0))
-        .number_mut()
+        .as_number_mut()
         .unwrap();
     if *count < iter_num {
         *count += 1.0;
@@ -77,15 +74,15 @@ pub(crate) fn repeat_basic(
     } else {
         memory.remove(block_id, "count");
         BlockReturn {
-            pointer: pointer + (args[1].number().unwrap() as usize) + 2,
+            pointer: pointer + (extra[0].as_number().unwrap() as usize) + 2,
             is_continue: false,
             return_value: None,
         }
     }
 }
 
-pub(crate) fn repeat_basic_end(pointer: usize, args: &Args) -> BlockReturn {
-    let length = args[0].number().unwrap();
+pub(crate) fn repeat_basic_end(pointer: usize, extra: &Args) -> BlockReturn {
+    let length = extra[0].as_number().unwrap();
     BlockReturn {
         pointer: pointer - (length as usize) - 1,
         is_continue: true,
@@ -97,7 +94,7 @@ pub(crate) fn length_of_string(pointer: usize, args: &Args, memory: &Memory) -> 
     let length = args[0]
         .to_raw_value(memory)
         .unwrap()
-        .string()
+        .as_string()
         .unwrap()
         .chars()
         .count();
@@ -115,8 +112,8 @@ pub(crate) fn set_variable(
     memory: &Memory,
     variables: &mut Query<&mut Variable>,
 ) -> BlockReturn {
-    let variable_id = args[0].string().unwrap();
-    let value = args[1].to_raw_value(memory).unwrap().string().unwrap();
+    let variable_id = args[0].as_string().unwrap();
+    let value = args[1].to_raw_value(memory).unwrap().as_string().unwrap();
 
     let mut variable = variables
         .iter_mut()
@@ -124,11 +121,7 @@ pub(crate) fn set_variable(
         .unwrap();
     variable.value = value.to_string();
 
-    BlockReturn {
-        pointer: pointer + 1,
-        is_continue: false,
-        return_value: None,
-    }
+    BlockReturn::basic(pointer)
 }
 
 pub(crate) fn get_variable(
@@ -137,7 +130,7 @@ pub(crate) fn get_variable(
     memory: &Memory,
     variables: &Query<&mut Variable>,
 ) -> BlockReturn {
-    let variable_id = args[0].string().unwrap();
+    let variable_id = args[0].to_raw_value(memory).unwrap().as_string().unwrap();
 
     let variable = variables
         .iter()
