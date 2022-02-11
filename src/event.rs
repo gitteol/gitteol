@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 
 use crate::{
-    code::{Code, CodeRunner, Queue},
+    code::{CodeRunner, Codes, Queue},
     object::Object,
     Id,
 };
@@ -19,14 +19,17 @@ pub(crate) struct Event {
 pub(crate) fn event_listener(
     mut events: EventReader<Event>,
     mut queue: ResMut<Queue>,
-    code: Query<(&Code, &Id), With<Object>>,
+    codes_query: Query<(&Codes, &Id), With<Object>>,
 ) {
-    let events: Vec<&EventType> = events.iter().map(|e| &e.event_type).collect();
-    code.iter()
-        .filter(|(Code { event: e, .. }, _)| events.contains(&e))
-        .for_each(|(code, id)| {
-            queue
-                .0
-                .push_back(CodeRunner::new(code.blocks.clone(), id.clone()))
-        });
+    for event in events.iter() {
+        for (codes, id) in codes_query.iter() {
+            for code in &codes.0 {
+                if code.event == event.event_type {
+                    queue
+                        .0
+                        .push_back(CodeRunner::new(code.blocks.clone(), id.clone()));
+                }
+            }
+        }
+    }
 }

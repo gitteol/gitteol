@@ -4,7 +4,7 @@ use serde_json::Result;
 pub(crate) mod types;
 
 use crate::{
-    code::Code,
+    code::{Code, Codes},
     object::{Object, ObjectType},
     Id,
 };
@@ -40,21 +40,19 @@ pub(crate) fn spawn_entities(
         }
         // info!("{:#?}", codes);
 
-        let mut object_entity = commands.spawn_bundle(SpriteBundle {
-            texture: asset_server.load("entrybot1.png"),
-            transform: Transform {
-                translation: Vec3::new(0.0, 0.0, 0.0),
-                scale: Vec3::new(0.315, 0.315, 1.0),
+        commands
+            .spawn_bundle(SpriteBundle {
+                texture: asset_server.load("entrybot1.png"),
+                transform: Transform {
+                    translation: Vec3::new(0.0, 0.0, 0.0),
+                    scale: Vec3::new(0.315, 0.315, 1.0),
+                    ..Default::default()
+                },
                 ..Default::default()
-            },
-            ..Default::default()
-        });
-        object_entity
+            })
             .insert(Object)
             .insert(Id(object.id))
-            .insert(ObjectType::Sprite);
-        for code in codes {
-            object_entity.insert(code);
-        }
+            .insert(ObjectType::Sprite)
+            .insert(Codes(codes));
     }
 }

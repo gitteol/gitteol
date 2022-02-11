@@ -16,6 +16,9 @@ pub(crate) struct Code {
     pub(crate) blocks: Vec<Block>,
 }
 
+#[derive(Component)]
+pub(crate) struct Codes(pub(crate) Vec<Code>);
+
 #[derive(Debug)]
 pub(crate) struct Memory(HashMap<String, Value>);
 impl Memory {

@@ -47,7 +47,7 @@ impl RawBlock {
                 };
                 match block_type {
                     BlockType::RepeatBasic => {
-                        let count = Value::Number(self.statements.0.len() as f32);
+                        let count = Value::Number(self.statements.0[0].len() as f32);
                         this_block.extra.push(count.clone());
                         blocks.push(this_block);
                         self.statements.0[0]
