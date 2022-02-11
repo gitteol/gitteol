@@ -10,7 +10,7 @@ use crate::{
     Id,
 };
 
-#[derive(Component)]
+#[derive(Component, Debug)]
 pub(crate) struct Code {
     pub(crate) event: EventType,
     pub(crate) blocks: Vec<Block>,

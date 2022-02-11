@@ -6,7 +6,8 @@ use crate::{
     Id,
 };
 
-#[derive(PartialEq, Eq)]
+#[derive(PartialEq, Eq, Clone, Copy, Debug, serde::Deserialize)]
+#[serde(rename_all = "snake_case")]
 pub(crate) enum EventType {
     WhenRunButtonClick,
 }

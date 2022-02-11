@@ -6,12 +6,11 @@ mod blocks;
 mod code;
 mod event;
 mod object;
+mod parser;
 mod variable;
 
-use blocks::{Block, BlockType, Value};
-use code::{Code, Queue};
+use code::Queue;
 use event::{Event, EventType};
-use object::{Object, ObjectType};
 use variable::{spawn_variable, Variable, VariableType};
 
 #[derive(Component, Debug, Clone, PartialEq, Eq, Hash)]
@@ -38,66 +37,8 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>, mut events: Eve
     commands.spawn_bundle(OrthographicCameraBundle::new_2d());
     commands.spawn_bundle(UiCameraBundle::default());
 
-    commands
-        .spawn_bundle(SpriteBundle {
-            texture: asset_server.load("entrybot1.png"),
-            transform: Transform {
-                translation: Vec3::new(0.0, 0.0, 0.0),
-                scale: Vec3::new(0.315, 0.315, 1.0),
-                ..Default::default()
-            },
-            ..Default::default()
-        })
-        .insert(Object)
-        .insert(Id::from_str("tund"))
-        .insert(ObjectType::Sprite)
-        .insert(Code {
-            event: EventType::WhenRunButtonClick,
-            blocks: vec![
-                Block {
-                    id: Id::from_str("ai3d"),
-                    block_type: BlockType::WaitSecond,
-                    args: vec![Value::Number(2.0)],
-                    extra: vec![],
-                },
-                Block {
-                    id: Id::from_str("niod"),
-                    block_type: BlockType::SetVariable,
-                    args: vec![
-                        Value::String("ie7y".to_string()),
-                        Value::String("20".to_string()),
-                    ],
-                    extra: vec![],
-                },
-                Block {
-                    id: Id::from_str("15qa"),
-                    block_type: BlockType::GetVariable,
-                    args: vec![Value::String("ie7y".to_string())],
-                    extra: vec![],
-                },
-                Block {
-                    id: Id::from_str("c5q1"),
-                    block_type: BlockType::RepeatBasic,
-                    args: vec![Value::Memory((
-                        Id::from_str("15qa"),
-                        "return_value".to_string(),
-                    ))],
-                    extra: vec![Value::Number(2.0)],
-                },
-                Block {
-                    id: Id::from_str("niob"),
-                    block_type: BlockType::MoveDirection,
-                    args: vec![Value::Number(10.0)],
-                    extra: vec![],
-                },
-                Block {
-                    id: Id::from_str("c5q1"),
-                    block_type: BlockType::RepeatBasicEnd,
-                    args: vec![],
-                    extra: vec![Value::Number(2.0)],
-                },
-            ],
-        });
+    let project = parser::parse().unwrap();
+    parser::spawn_entities(&mut commands, &asset_server, project);
 
     let parent_ui = commands
         .spawn_bundle(NodeBundle {

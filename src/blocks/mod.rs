@@ -1,8 +1,11 @@
+use serde::Deserialize;
+
 use crate::{code::Memory, Id};
 
 pub(crate) mod functions;
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, serde::Deserialize)]
+#[serde(rename_all = "snake_case")]
 pub(crate) enum BlockType {
     MoveDirection,
     WaitSecond,
@@ -11,6 +14,15 @@ pub(crate) enum BlockType {
     LengthOfString,
     SetVariable,
     GetVariable,
+}
+
+#[derive(Deserialize, Debug)]
+pub(crate) enum LiteralBlockType {
+    #[serde(rename = "number")]
+    Number,
+    #[serde(rename = "text")]
+    Text,
+    True,
 }
 
 #[derive(Clone, Debug)]
