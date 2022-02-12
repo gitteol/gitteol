@@ -25,7 +25,8 @@ pub(crate) enum LiteralBlockType {
     True,
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Deserialize)]
+#[serde(untagged)]
 pub(crate) enum Value {
     String(String),
     Number(f32),
@@ -33,7 +34,7 @@ pub(crate) enum Value {
     Memory((Id, String)),
 }
 impl Value {
-    fn as_string(&self) -> Result<String, &str> {
+    pub(crate) fn as_string(&self) -> Result<String, &str> {
         match self {
             Self::String(val) => Ok(val.to_string()),
             Self::Number(val) => Ok(val.to_string()),
@@ -41,7 +42,7 @@ impl Value {
             _ => Err("cannot convert as string"),
         }
     }
-    fn as_number(&self) -> Result<f32, &str> {
+    pub(crate) fn as_number(&self) -> Result<f32, &str> {
         match self {
             Self::Number(val) => Ok(*val),
             Self::String(val) => val.parse::<f32>().or(Err("cannot convert as number")),
@@ -49,19 +50,19 @@ impl Value {
             _ => Err("cannot convert as number"),
         }
     }
-    fn as_number_mut(&mut self) -> Result<&mut f32, &str> {
+    pub(crate) fn as_number_mut(&mut self) -> Result<&mut f32, &str> {
         match self {
             Self::Number(val) => Ok(val),
             _ => Err("cannot convert as mutable number"),
         }
     }
-    fn as_bool(&self) -> Option<bool> {
+    pub(crate) fn as_bool(&self) -> Option<bool> {
         match self {
             Self::Bool(val) => Some(*val),
             _ => None,
         }
     }
-    fn to_raw_value<'a>(&'a self, memory: &'a Memory) -> Option<&'a Value> {
+    pub(crate) fn to_raw_value<'a>(&'a self, memory: &'a Memory) -> Option<&'a Value> {
         let mut value = Some(self);
         while let Some(Value::Memory((id, label))) = value {
             value = memory.get(id, label);

@@ -3,12 +3,14 @@ use serde::Deserialize;
 use crate::{
     blocks::{Block, BlockType, LiteralBlockType, Value},
     event::EventType,
-    Id,
+    variable::{Variable, VariableType},
+    Id, LocalPos,
 };
 
 #[derive(Deserialize, Debug)]
 pub(crate) struct RawProject {
     pub(crate) objects: Vec<RawObject>,
+    pub(crate) variables: Vec<RawVariable>,
 }
 
 #[derive(Deserialize, Debug)]
@@ -47,18 +49,22 @@ impl RawBlock {
                 };
                 match block_type {
                     BlockType::RepeatBasic => {
-                        let count = Value::Number(self.statements.0[0].len() as f32);
-                        this_block.extra.push(count.clone());
-                        blocks.push(this_block);
+                        let mut statements = Vec::new();
                         self.statements.0[0]
                             .iter()
-                            .for_each(|block| blocks.append(&mut block.to_blocks()));
+                            .for_each(|block| statements.append(&mut block.to_blocks()));
+
+                        let count = Value::Number(statements.len() as f32);
+                        this_block.extra.push(count.clone());
+
+                        blocks.push(this_block);
+                        blocks.append(&mut statements);
                         blocks.push(Block {
                             id: Id::from_str(&self.id),
                             block_type: BlockType::RepeatBasicEnd,
                             args: vec![],
                             extra: vec![count],
-                        })
+                        });
                     }
                     _ => blocks.push(this_block),
                 };
@@ -105,6 +111,32 @@ impl RawParam {
             RawParam::String(val) => Some(Value::String(val.to_string())),
             RawParam::Bool(val) => Some(Value::Bool(*val)),
             RawParam::Null => None,
+        }
+    }
+}
+
+#[derive(Deserialize, Debug)]
+pub(crate) struct RawVariable {
+    name: String,
+    id: String,
+    visible: bool,
+    value: Value,
+    #[serde(rename = "variableType")]
+    variable_type: VariableType,
+    object: Option<String>,
+    x: f32,
+    y: f32,
+}
+
+impl RawVariable {
+    pub(crate) fn to_variable(&self) -> Variable {
+        Variable {
+            id: Id::from_str(&self.id),
+            variable_type: self.variable_type,
+            name: self.name.clone(),
+            value: self.value.clone(),
+            visible: self.visible,
+            pos: LocalPos::new(self.x, self.y),
         }
     }
 }

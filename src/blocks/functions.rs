@@ -113,13 +113,13 @@ pub(crate) fn set_variable(
     variables: &mut Query<&mut Variable>,
 ) -> BlockReturn {
     let variable_id = args[0].as_string().unwrap();
-    let value = args[1].to_raw_value(memory).unwrap().as_string().unwrap();
+    let value = args[1].to_raw_value(memory).unwrap();
 
     let mut variable = variables
         .iter_mut()
         .find(|variable| variable.id.0 == variable_id)
         .unwrap();
-    variable.value = value.to_string();
+    variable.value = value.clone();
 
     BlockReturn::basic(pointer)
 }
@@ -139,6 +139,6 @@ pub(crate) fn get_variable(
     BlockReturn {
         pointer: pointer + 1,
         is_continue: false,
-        return_value: Some(Value::String(variable.value.clone())),
+        return_value: Some(variable.value.clone()),
     }
 }

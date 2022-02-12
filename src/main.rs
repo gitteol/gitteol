@@ -11,9 +11,10 @@ mod variable;
 
 use code::Queue;
 use event::{Event, EventType};
+use serde::Deserialize;
 use variable::{spawn_variable, Variable, VariableType};
 
-#[derive(Component, Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Component, Debug, Clone, PartialEq, Eq, Hash, Deserialize)]
 pub struct Id(String);
 
 impl Id {
@@ -38,7 +39,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>, mut events: Eve
     commands.spawn_bundle(UiCameraBundle::default());
 
     let project = parser::parse().unwrap();
-    parser::spawn_entities(&mut commands, &asset_server, project);
+    parser::spawn_objects(&mut commands, &asset_server, &project);
 
     let parent_ui = commands
         .spawn_bundle(NodeBundle {
@@ -51,19 +52,14 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>, mut events: Eve
         })
         .id();
     let font = asset_server.load("fonts/NanumGothic.ttf");
-    spawn_variable(
-        &mut commands,
-        font,
-        parent_ui,
-        Variable {
-            id: Id::from_str("ie7y"),
-            variable_type: VariableType::Normal,
-            name: "변수2".to_string(),
-            value: "014".to_string(),
-            visible: true,
-            pos: LocalPos::new(-230.0, -105.0),
-        },
-    );
+    for raw_variable in project.variables {
+        spawn_variable(
+            &mut commands,
+            font.clone(),
+            parent_ui,
+            raw_variable.to_variable(),
+        );
+    }
 
     events.send(Event {
         event_type: EventType::WhenRunButtonClick,

@@ -1,12 +1,26 @@
 use bevy::prelude::*;
+use serde::Deserialize;
 
-use crate::{Id, LocalPos};
+use crate::{blocks::Value, Id, LocalPos};
 
-#[derive(Clone)]
+#[derive(Clone, Copy, Deserialize, Debug)]
 pub(crate) enum VariableType {
+    #[serde(rename = "variable")]
     Normal,
+    #[serde(rename = "timer")]
     Timer,
+    #[serde(rename = "answer")]
     Answer,
+}
+
+impl VariableType {
+    fn get_color(&self) -> Color {
+        match self {
+            VariableType::Normal => Color::rgb(0.36, 0.50, 0.97),
+            VariableType::Timer => Color::rgb(0.92, 0.70, 0.26),
+            VariableType::Answer => Color::rgb(0.90, 0.51, 0.92),
+        }
+    }
 }
 
 #[derive(Component, Clone)]
@@ -14,7 +28,7 @@ pub(crate) struct Variable {
     pub(crate) id: Id,
     pub(crate) variable_type: VariableType,
     pub(crate) name: String,
-    pub(crate) value: String,
+    pub(crate) value: Value,
     pub(crate) visible: bool,
     pub(crate) pos: LocalPos,
 }
@@ -36,6 +50,7 @@ pub(crate) fn spawn_variable(
 ) {
     let name = variable.name.clone();
     let position = variable.pos.to_variable_pos();
+    let color = variable.variable_type.get_color();
 
     let variable_entity = commands.spawn().insert(variable).id();
 
@@ -52,9 +67,10 @@ pub(crate) fn spawn_variable(
                     top: Val::Px(position.1),
                     ..Default::default()
                 },
+                display: Display::Flex,
                 ..Default::default()
             },
-            color: Color::rgb(0.27, 0.53, 0.47).into(),
+            color: color.into(),
             ..Default::default()
         })
         .with_children(|parent| {
@@ -79,7 +95,7 @@ pub(crate) fn spawn_variable(
                                 style: TextStyle {
                                     font: font.clone(),
                                     font_size: 15.0,
-                                    color: Color::rgb(0.56, 0.76, 0.72),
+                                    color: Color::rgba(1.0, 1.0, 1.0, 0.5),
                                 },
                             },
                             TextSection {
@@ -103,14 +119,19 @@ pub(crate) fn spawn_variable(
 }
 
 pub(crate) fn variable_ui_system(
-    uis: Query<(&VariableUi, &Children)>,
+    mut uis: Query<(&VariableUi, &mut Style, &Children)>,
     variables: Query<&Variable>,
     mut texts: Query<&mut Text, With<VariableUiType>>,
 ) {
-    for (ui, children) in uis.iter() {
+    for (ui, mut style, children) in uis.iter_mut() {
         if let Ok(variable) = variables.get(ui.0) {
             if let Ok(mut text) = texts.get_mut(children[0]) {
-                text.sections[2].value = variable.value.clone();
+                text.sections[2].value = variable.value.as_string().unwrap();
+            }
+            if variable.visible {
+                style.display = Display::Flex;
+            } else {
+                style.display = Display::None;
             }
         };
     }

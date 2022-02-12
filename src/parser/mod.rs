@@ -17,12 +17,12 @@ pub(crate) fn parse() -> Result<RawProject> {
     serde_json::from_str(data)
 }
 
-pub(crate) fn spawn_entities(
+pub(crate) fn spawn_objects(
     commands: &mut Commands,
     asset_server: &Res<AssetServer>,
-    project: RawProject,
+    project: &RawProject,
 ) {
-    for object in project.objects {
+    for object in &project.objects {
         let script: RawScript = serde_json::from_str(&object.script).unwrap();
         let mut codes = Vec::new();
         for code in script.0 {
@@ -51,7 +51,7 @@ pub(crate) fn spawn_entities(
                 ..Default::default()
             })
             .insert(Object)
-            .insert(Id(object.id))
+            .insert(Id::from_str(&object.id))
             .insert(ObjectType::Sprite)
             .insert(Codes(codes));
     }
