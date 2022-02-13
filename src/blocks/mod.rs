@@ -1,6 +1,6 @@
 use serde::Deserialize;
 
-use crate::{code::Memory, Id};
+use crate::{code::Memory, common::Id};
 
 pub(crate) mod functions;
 

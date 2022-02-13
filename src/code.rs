@@ -4,10 +4,10 @@ use bevy::prelude::*;
 
 use crate::{
     blocks::{functions, Block, BlockType, Value},
+    common::{Id, Ids},
     event::EventType,
     object::Object,
     variable::Variable,
-    Id,
 };
 
 #[derive(Component, Debug)]
@@ -73,7 +73,8 @@ pub(crate) struct Queue(pub(crate) VecDeque<CodeRunner>);
 pub(crate) fn execute_code(
     mut queue: ResMut<Queue>,
     time: Res<Time>,
-    mut transforms: Query<(&mut Transform, &Id), With<Object>>,
+    ids: Res<Ids>,
+    mut transforms: Query<&mut Transform, With<Object>>,
     mut variables: Query<&mut Variable>,
 ) {
     let mut new_queue: VecDeque<CodeRunner> = VecDeque::new();
@@ -86,7 +87,9 @@ pub(crate) fn execute_code(
             mut memory,
         } = queue.0.pop_front().unwrap();
 
-        let (mut transform, _) = transforms.iter_mut().find(|(_, id)| **id == owner).unwrap();
+        let owner_entity = ids.get(&owner).unwrap();
+
+        let mut transform = transforms.get_mut(*owner_entity).unwrap();
 
         while let Some(block) = code.get_mut(pointer) {
             let block_return = match block.block_type {
@@ -111,10 +114,10 @@ pub(crate) fn execute_code(
                     functions::wait_second(pointer, &block.args, &block.id, &mut memory, &time)
                 }
                 BlockType::SetVariable => {
-                    functions::set_variable(pointer, &block.args, &memory, &mut variables)
+                    functions::set_variable(pointer, &block.args, &memory, &mut variables, &ids)
                 }
                 BlockType::GetVariable => {
-                    functions::get_variable(pointer, &block.args, &memory, &variables)
+                    functions::get_variable(pointer, &block.args, &memory, &variables, &ids)
                 }
             };
             pointer = block_return.pointer;

@@ -2,15 +2,21 @@ use serde::Deserialize;
 
 use crate::{
     blocks::{Block, BlockType, LiteralBlockType, Value},
+    common::{Id, LocalPos},
     event::EventType,
     variable::{Variable, VariableType},
-    Id, LocalPos,
 };
 
 #[derive(Deserialize, Debug)]
 pub(crate) struct RawProject {
     pub(crate) objects: Vec<RawObject>,
     pub(crate) variables: Vec<RawVariable>,
+}
+
+impl RawProject {
+    pub(crate) fn parse(project: &str) -> serde_json::Result<RawProject> {
+        serde_json::from_str(project)
+    }
 }
 
 #[derive(Deserialize, Debug)]
@@ -21,6 +27,12 @@ pub(crate) struct RawObject {
 
 #[derive(Deserialize, Debug)]
 pub(crate) struct RawScript(pub(crate) Vec<Vec<RawBlock>>);
+
+impl RawScript {
+    pub(crate) fn parse(script: &str) -> serde_json::Result<RawScript> {
+        serde_json::from_str(script)
+    }
+}
 
 #[derive(Deserialize, Debug)]
 pub(crate) struct RawBlock {

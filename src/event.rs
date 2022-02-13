@@ -2,8 +2,8 @@ use bevy::prelude::*;
 
 use crate::{
     code::{CodeRunner, Codes, Queue},
+    common::Id,
     object::Object,
-    Id,
 };
 
 #[derive(PartialEq, Eq, Clone, Copy, Debug, serde::Deserialize)]

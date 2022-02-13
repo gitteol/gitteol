@@ -1,6 +1,10 @@
 use bevy::prelude::*;
 
-use crate::{code::Memory, variable::Variable, Id};
+use crate::{
+    code::Memory,
+    common::{Id, Ids},
+    variable::Variable,
+};
 
 use super::{BlockReturn, Value};
 
@@ -111,14 +115,14 @@ pub(crate) fn set_variable(
     args: &Args,
     memory: &Memory,
     variables: &mut Query<&mut Variable>,
+    ids: &Ids,
 ) -> BlockReturn {
     let variable_id = args[0].as_string().unwrap();
+    let variable_entity = ids.get(&Id::from_str(&variable_id)).unwrap();
     let value = args[1].to_raw_value(memory).unwrap();
 
-    let mut variable = variables
-        .iter_mut()
-        .find(|variable| variable.id.0 == variable_id)
-        .unwrap();
+    let mut variable = variables.get_mut(*variable_entity).unwrap();
+
     variable.value = value.clone();
 
     BlockReturn::basic(pointer)
@@ -129,13 +133,12 @@ pub(crate) fn get_variable(
     args: &Args,
     memory: &Memory,
     variables: &Query<&mut Variable>,
+    ids: &Ids,
 ) -> BlockReturn {
     let variable_id = args[0].to_raw_value(memory).unwrap().as_string().unwrap();
+    let variable_entity = ids.get(&Id::from_str(&variable_id)).unwrap();
+    let variable = variables.get(*variable_entity).unwrap();
 
-    let variable = variables
-        .iter()
-        .find(|variable| variable.id.0 == variable_id)
-        .unwrap();
     BlockReturn {
         pointer: pointer + 1,
         is_continue: false,

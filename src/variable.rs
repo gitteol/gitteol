@@ -1,7 +1,10 @@
 use bevy::prelude::*;
 use serde::Deserialize;
 
-use crate::{blocks::Value, Id, LocalPos};
+use crate::{
+    blocks::Value,
+    common::{Id, Ids, LocalPos},
+};
 
 #[derive(Clone, Copy, Deserialize, Debug)]
 pub(crate) enum VariableType {
@@ -47,12 +50,16 @@ pub(crate) fn spawn_variable(
     font: Handle<Font>,
     parent_ui: Entity,
     variable: Variable,
+    ids: &mut Ids,
 ) {
+    let id = variable.id.clone();
     let name = variable.name.clone();
     let position = variable.pos.to_variable_pos();
     let color = variable.variable_type.get_color();
 
     let variable_entity = commands.spawn().insert(variable).id();
+
+    ids.insert(id, variable_entity);
 
     commands
         .spawn()

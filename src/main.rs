@@ -4,42 +4,28 @@ use bevy::{core::FixedTimestep, prelude::*};
 
 mod blocks;
 mod code;
+mod common;
 mod event;
 mod object;
 mod parser;
 mod variable;
 
 use code::Queue;
+use common::Ids;
 use event::{Event, EventType};
-use serde::Deserialize;
-use variable::{spawn_variable, Variable, VariableType};
-
-#[derive(Component, Debug, Clone, PartialEq, Eq, Hash, Deserialize)]
-pub struct Id(String);
-
-impl Id {
-    fn from_str(id: &str) -> Id {
-        Id(id.to_string())
-    }
-}
-
-#[derive(Component, Clone)]
-struct LocalPos(f32, f32);
-impl LocalPos {
-    fn new(x: f32, y: f32) -> Self {
-        Self(x, y)
-    }
-    fn to_variable_pos(&self) -> (f32, f32) {
-        (self.0 + 240.0, self.1 + 135.0 - 9.0)
-    }
-}
+use object::spawn_objects;
+use parser::RawProject;
+use variable::spawn_variable;
 
 fn setup(mut commands: Commands, asset_server: Res<AssetServer>, mut events: EventWriter<Event>) {
     commands.spawn_bundle(OrthographicCameraBundle::new_2d());
     commands.spawn_bundle(UiCameraBundle::default());
 
-    let project = parser::parse().unwrap();
-    parser::spawn_objects(&mut commands, &asset_server, &project);
+    let mut ids = Ids::new();
+
+    let data = include_str!("../assets/project.json");
+    let project = RawProject::parse(data).unwrap();
+    spawn_objects(&mut commands, &asset_server, &project.objects, &mut ids);
 
     let parent_ui = commands
         .spawn_bundle(NodeBundle {
@@ -58,8 +44,11 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>, mut events: Eve
             font.clone(),
             parent_ui,
             raw_variable.to_variable(),
+            &mut ids,
         );
     }
+
+    commands.insert_resource(ids);
 
     events.send(Event {
         event_type: EventType::WhenRunButtonClick,
