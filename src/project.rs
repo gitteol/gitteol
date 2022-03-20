@@ -1,3 +1,4 @@
+use bevy::reflect::TypeUuid;
 use serde::Deserialize;
 
 use crate::{
@@ -7,16 +8,11 @@ use crate::{
     variable::{Variable, VariableType},
 };
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, TypeUuid)]
+#[uuid = "be3c1877-7c8e-4872-bd28-a6de720c69b9"]
 pub(crate) struct RawProject {
     pub(crate) objects: Vec<RawObject>,
     pub(crate) variables: Vec<RawVariable>,
-}
-
-impl RawProject {
-    pub(crate) fn parse(project: &str) -> serde_json::Result<RawProject> {
-        serde_json::from_str(project)
-    }
 }
 
 #[derive(Deserialize, Debug)]

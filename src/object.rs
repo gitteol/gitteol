@@ -3,7 +3,7 @@ use bevy::prelude::*;
 use crate::{
     code::{Code, Codes},
     common::{Id, Ids},
-    parser::{RawBlockType, RawObject, RawScript},
+    project::{RawBlockType, RawObject, RawScript},
 };
 
 #[derive(Component)]
