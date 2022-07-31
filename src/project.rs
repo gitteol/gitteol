@@ -2,7 +2,7 @@ use bevy::reflect::TypeUuid;
 use serde::Deserialize;
 
 use crate::{
-    blocks::{Block, BlockType, LiteralBlockType, Value},
+    blocks::{BlockType, BlockVec, LiteralBlockType, Value},
     common::{Id, LocalPos},
     event::EventType,
     variable::{Variable, VariableType},
@@ -28,6 +28,17 @@ impl RawScript {
     pub(crate) fn parse(script: &str) -> serde_json::Result<RawScript> {
         serde_json::from_str(script)
     }
+    pub(crate) fn to_statements(&self) -> Vec<BlockVec> {
+        let mut codes = Vec::new();
+        for code in self.0.iter() {
+            let mut blocks = Vec::new();
+            for block in code {
+                blocks.append(&mut block.to_blocks());
+            }
+            codes.push(blocks);
+        }
+        codes
+    }
 }
 
 #[derive(Deserialize, Debug)]
@@ -40,42 +51,12 @@ pub(crate) struct RawBlock {
 }
 
 impl RawBlock {
-    pub(crate) fn to_blocks(&self) -> Vec<Block> {
+    pub(crate) fn to_blocks(&self) -> BlockVec {
         let mut blocks = Vec::new();
         match self.block_type {
             RawBlockType::Normal(block_type) => {
-                let args = self
-                    .params
-                    .iter()
-                    .filter_map(|param| param.to_arg(&mut blocks))
-                    .collect();
-                let mut this_block = Block {
-                    id: Id::from_str(&self.id),
-                    block_type,
-                    args,
-                    extra: vec![],
-                };
-                match block_type {
-                    BlockType::RepeatBasic => {
-                        let mut statements = Vec::new();
-                        self.statements.0[0]
-                            .iter()
-                            .for_each(|block| statements.append(&mut block.to_blocks()));
-
-                        let count = Value::Number(statements.len() as f32);
-                        this_block.extra.push(count.clone());
-
-                        blocks.push(this_block);
-                        blocks.append(&mut statements);
-                        blocks.push(Block {
-                            id: Id::from_str(&self.id),
-                            block_type: BlockType::RepeatBasicEnd,
-                            args: vec![],
-                            extra: vec![count],
-                        });
-                    }
-                    _ => blocks.push(this_block),
-                };
+                let mut block = block_type.new_block()(self);
+                blocks.append(&mut block);
             }
             _ => unreachable!(),
         }
@@ -103,12 +84,12 @@ pub(crate) enum RawParam {
 }
 
 impl RawParam {
-    fn to_arg(&self, blocks: &mut Vec<Block>) -> Option<Value> {
+    pub(crate) fn to_arg(&self, blocks: &mut BlockVec) -> Option<Value> {
         match self {
             RawParam::Block(block) => match block.block_type {
                 RawBlockType::Normal(_) => {
                     let mut param_blocks = block.to_blocks();
-                    let last_id = param_blocks.last().unwrap().id.clone();
+                    let last_id = param_blocks.last().unwrap().get_id().clone();
                     blocks.append(&mut param_blocks);
                     Some(Value::Memory((last_id, "return_value".to_string())))
                 }

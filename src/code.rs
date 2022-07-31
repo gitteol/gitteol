@@ -1,19 +1,19 @@
 use std::collections::{HashMap, VecDeque};
 
-use bevy::prelude::*;
+use bevy::{ecs::query::WorldQuery, prelude::*};
 
 use crate::{
-    blocks::{functions, Block, BlockType, Value},
+    blocks::{BlockDef, BlockVec, Value},
     common::{Id, Ids},
     event::EventType,
     object::Object,
     variable::Variable,
 };
 
-#[derive(Component, Debug)]
+#[derive(Component)]
 pub(crate) struct Code {
     pub(crate) event: EventType,
-    pub(crate) blocks: Vec<Block>,
+    pub(crate) blocks: Vec<Box<dyn BlockDef + Send + Sync>>,
 }
 
 #[derive(Component)]
@@ -52,13 +52,13 @@ impl Memory {
 }
 
 pub(crate) struct CodeRunner {
-    code: Vec<Block>,
+    code: BlockVec,
     pointer: usize,
     owner: Id,
     memory: Memory,
 }
 impl CodeRunner {
-    pub(crate) fn new(code: Vec<Block>, owner: Id) -> Self {
+    pub(crate) fn new(code: BlockVec, owner: Id) -> Self {
         CodeRunner {
             code,
             pointer: 0,
@@ -68,13 +68,26 @@ impl CodeRunner {
     }
 }
 
+#[derive(WorldQuery)]
+#[world_query(mutable)]
+pub(crate) struct ObjectQuery<'w> {
+    pub(crate) transform: &'w mut Transform,
+}
+
+pub(crate) struct Resources<'a, 'b, 'c, 'd> {
+    pub(crate) time: &'a Res<'a, Time>,
+    pub(crate) ids: &'a Res<'a, Ids>,
+    pub(crate) object: &'a mut ObjectQueryItem<'a>,
+    pub(crate) variables: &'a mut Query<'b, 'c, &'d mut Variable>,
+}
+
 pub(crate) struct Queue(pub(crate) VecDeque<CodeRunner>);
 
 pub(crate) fn execute_code(
     mut queue: ResMut<Queue>,
     time: Res<Time>,
     ids: Res<Ids>,
-    mut transforms: Query<&mut Transform, With<Object>>,
+    mut objects: Query<ObjectQuery, With<Object>>,
     mut variables: Query<&mut Variable>,
 ) {
     let mut new_queue: VecDeque<CodeRunner> = VecDeque::new();
@@ -89,40 +102,20 @@ pub(crate) fn execute_code(
 
         let owner_entity = ids.get(&owner).unwrap();
 
-        let mut transform = transforms.get_mut(*owner_entity).unwrap();
+        let mut this_object = objects.get_mut(*owner_entity).unwrap();
+
+        let mut res = Resources {
+            time: &time,
+            ids: &ids,
+            object: &mut this_object,
+            variables: &mut variables,
+        };
 
         while let Some(block) = code.get_mut(pointer) {
-            let block_return = match block.block_type {
-                BlockType::MoveDirection => functions::move_direction(
-                    pointer,
-                    &block.args,
-                    &memory,
-                    &mut transform.translation,
-                ),
-                BlockType::RepeatBasic => functions::repeat_basic(
-                    pointer,
-                    &block.args,
-                    &block.extra,
-                    &block.id,
-                    &mut memory,
-                ),
-                BlockType::RepeatBasicEnd => functions::repeat_basic_end(pointer, &block.extra),
-                BlockType::LengthOfString => {
-                    functions::length_of_string(pointer, &block.args, &memory)
-                }
-                BlockType::WaitSecond => {
-                    functions::wait_second(pointer, &block.args, &block.id, &mut memory, &time)
-                }
-                BlockType::SetVariable => {
-                    functions::set_variable(pointer, &block.args, &memory, &mut variables, &ids)
-                }
-                BlockType::GetVariable => {
-                    functions::get_variable(pointer, &block.args, &memory, &variables, &ids)
-                }
-            };
+            let block_return = block.run(pointer, &mut memory, &mut res);
             pointer = block_return.pointer;
             if let Some(return_value) = block_return.return_value {
-                memory.insert(&block.id, "return_value", return_value);
+                memory.insert(&block.get_id(), "return_value", return_value);
             }
             info!("pointer: {}, memory: {:?}", pointer, memory);
             if block_return.is_continue {
