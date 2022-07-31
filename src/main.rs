@@ -1,7 +1,7 @@
 use std::collections::VecDeque;
 
 use asset::ProjectAssetLoader;
-use bevy::{core::FixedTimestep, prelude::*};
+use bevy::{prelude::*, time::FixedTimestep};
 
 mod asset;
 mod blocks;
@@ -37,8 +37,7 @@ fn setup(
     project_assets: Res<Assets<RawProject>>,
     project_data: ResMut<ProjectData>,
 ) {
-    commands.spawn_bundle(OrthographicCameraBundle::new_2d());
-    commands.spawn_bundle(UiCameraBundle::default());
+    commands.spawn_bundle(Camera2dBundle::default());
 
     let mut ids = Ids::new();
 
@@ -46,7 +45,19 @@ fn setup(
 
     spawn_objects(&mut commands, &asset_server, &project.objects, &mut ids);
 
-    let parent_ui = commands
+    let font = asset_server.load("fonts/NanumGothic.ttf");
+
+    let mut variable_ui_children = Vec::new();
+    for raw_variable in &project.variables {
+        variable_ui_children.push(spawn_variable(
+            &mut commands,
+            font.clone(),
+            raw_variable.to_variable(),
+            &mut ids,
+        ))
+    }
+
+    commands
         .spawn_bundle(NodeBundle {
             style: Style {
                 size: Size::new(Val::Percent(100.0), Val::Percent(100.0)),
@@ -55,17 +66,7 @@ fn setup(
             color: Color::NONE.into(),
             ..Default::default()
         })
-        .id();
-    let font = asset_server.load("fonts/NanumGothic.ttf");
-    for raw_variable in &project.variables {
-        spawn_variable(
-            &mut commands,
-            font.clone(),
-            parent_ui,
-            raw_variable.to_variable(),
-            &mut ids,
-        );
-    }
+        .push_children(&variable_ui_children);
 
     commands.insert_resource(ids);
 

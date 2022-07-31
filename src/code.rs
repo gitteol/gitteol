@@ -74,10 +74,10 @@ pub(crate) struct ObjectQuery<'w> {
     pub(crate) transform: &'w mut Transform,
 }
 
-pub(crate) struct Resources<'a, 'b, 'c, 'd> {
+pub(crate) struct Resources<'a, 'b, 'c, 'd, 'e> {
     pub(crate) time: &'a Res<'a, Time>,
     pub(crate) ids: &'a Res<'a, Ids>,
-    pub(crate) object: &'a mut ObjectQueryItem<'a>,
+    pub(crate) object: &'a mut ObjectQueryItem<'a, 'e>,
     pub(crate) variables: &'a mut Query<'b, 'c, &'d mut Variable>,
 }
 

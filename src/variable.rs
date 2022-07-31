@@ -1,4 +1,4 @@
-use bevy::prelude::*;
+use bevy::{prelude::*};
 use serde::Deserialize;
 
 use crate::{
@@ -48,10 +48,9 @@ pub(crate) struct VariableUi(Entity);
 pub(crate) fn spawn_variable(
     commands: &mut Commands,
     font: Handle<Font>,
-    parent_ui: Entity,
     variable: Variable,
     ids: &mut Ids,
-) {
+) -> Entity {
     let id = variable.id.clone();
     let name = variable.name.clone();
     let position = variable.pos.to_variable_pos();
@@ -65,11 +64,10 @@ pub(crate) fn spawn_variable(
         .spawn()
         .insert(VariableUi(variable_entity))
         .insert(VariableUiType::Container)
-        .insert(Parent(parent_ui))
         .insert_bundle(NodeBundle {
             style: Style {
                 position_type: PositionType::Absolute,
-                position: Rect {
+                position: UiRect {
                     left: Val::Px(position.0),
                     top: Val::Px(position.1),
                     ..Default::default()
@@ -84,7 +82,7 @@ pub(crate) fn spawn_variable(
             parent
                 .spawn_bundle(TextBundle {
                     style: Style {
-                        margin: Rect::all(Val::Px(3.0)),
+                        margin: UiRect::all(Val::Px(3.0)),
                         ..Default::default()
                     },
                     text: Text {
@@ -122,7 +120,8 @@ pub(crate) fn spawn_variable(
                     ..Default::default()
                 })
                 .insert(VariableUiType::Text);
-        });
+        })
+        .id()
 }
 
 pub(crate) fn variable_ui_system(
