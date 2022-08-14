@@ -3,7 +3,7 @@ use std::collections::{HashMap, VecDeque};
 use bevy::{ecs::query::WorldQuery, prelude::*};
 
 use crate::{
-    blocks::{BlockDef, BlockVec, Value},
+    blocks::{Block, BlockVec, Value},
     common::{Id, Ids},
     event::EventType,
     object::Object,
@@ -13,7 +13,7 @@ use crate::{
 #[derive(Component)]
 pub(crate) struct Code {
     pub(crate) event: EventType,
-    pub(crate) blocks: Vec<Box<dyn BlockDef + Send + Sync>>,
+    pub(crate) blocks: Vec<Box<dyn Block + Send + Sync>>,
 }
 
 #[derive(Component)]
