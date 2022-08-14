@@ -3,7 +3,7 @@
     {
       "id": "7y0y",
       "name": "엔트리봇",
-      "script": "[[{\"id\":\"7hv8\",\"x\":50,\"y\":30,\"type\":\"when_run_button_click\",\"params\":[null],\"statements\":[],\"movable\":null,\"deletable\":1,\"emphasized\":false,\"readOnly\":null,\"copyable\":true,\"extensions\":[]},{\"id\":\"l1bm\",\"x\":0,\"y\":0,\"type\":\"wait_second\",\"params\":[{\"id\":\"ch5y\",\"x\":0,\"y\":0,\"type\":\"number\",\"params\":[\"1\"],\"statements\":[],\"movable\":null,\"deletable\":1,\"emphasized\":false,\"readOnly\":null,\"copyable\":true,\"extensions\":[]},null],\"statements\":[],\"movable\":null,\"deletable\":1,\"emphasized\":false,\"readOnly\":null,\"copyable\":true,\"extensions\":[]},{\"id\":\"v8vh\",\"x\":0,\"y\":0,\"type\":\"set_variable\",\"params\":[\"p341\",{\"id\":\"f8xo\",\"x\":0,\"y\":0,\"type\":\"text\",\"params\":[\"5\"],\"statements\":[],\"movable\":null,\"deletable\":1,\"emphasized\":false,\"readOnly\":null,\"copyable\":true,\"extensions\":[]},null],\"statements\":[],\"movable\":null,\"deletable\":1,\"emphasized\":false,\"readOnly\":null,\"copyable\":true,\"extensions\":[]},{\"id\":\"55n3\",\"x\":0,\"y\":0,\"type\":\"repeat_basic\",\"params\":[{\"id\":\"ru8h\",\"x\":0,\"y\":0,\"type\":\"number\",\"params\":[10],\"statements\":[],\"movable\":null,\"deletable\":1,\"emphasized\":false,\"readOnly\":null,\"copyable\":true,\"extensions\":[]},null],\"statements\":[[{\"id\":\"04tm\",\"x\":0,\"y\":0,\"type\":\"move_direction\",\"params\":[{\"id\":\"cffq\",\"x\":0,\"y\":0,\"type\":\"get_variable\",\"params\":[\"p341\",null],\"statements\":[],\"movable\":null,\"deletable\":1,\"emphasized\":false,\"readOnly\":null,\"copyable\":true,\"extensions\":[]},null],\"statements\":[],\"movable\":null,\"deletable\":1,\"emphasized\":false,\"readOnly\":null,\"copyable\":true,\"extensions\":[]}]],\"movable\":null,\"deletable\":1,\"emphasized\":false,\"readOnly\":null,\"copyable\":true,\"extensions\":[]}]]",
+      "script": "[[{\"id\":\"ha0z\",\"x\":50,\"y\":30,\"type\":\"when_run_button_click\",\"params\":[null],\"statements\":[],\"movable\":null,\"deletable\":1,\"emphasized\":false,\"readOnly\":null,\"copyable\":true,\"extensions\":[]},{\"id\":\"i6pi\",\"x\":0,\"y\":0,\"type\":\"wait_second\",\"params\":[{\"id\":\"x2us\",\"x\":0,\"y\":0,\"type\":\"number\",\"params\":[\"1\"],\"statements\":[],\"movable\":null,\"deletable\":1,\"emphasized\":false,\"readOnly\":null,\"copyable\":true,\"extensions\":[]},null],\"statements\":[],\"movable\":null,\"deletable\":1,\"emphasized\":false,\"readOnly\":null,\"copyable\":true,\"extensions\":[]},{\"id\":\"1c99\",\"x\":0,\"y\":0,\"type\":\"repeat_basic\",\"params\":[{\"id\":\"nq5l\",\"x\":0,\"y\":0,\"type\":\"number\",\"params\":[\"10\"],\"statements\":[],\"movable\":null,\"deletable\":1,\"emphasized\":false,\"readOnly\":null,\"copyable\":true,\"extensions\":[]},null],\"statements\":[[{\"id\":\"m8wf\",\"x\":0,\"y\":0,\"type\":\"change_variable\",\"params\":[\"bewa\",{\"id\":\"crn7\",\"x\":0,\"y\":0,\"type\":\"text\",\"params\":[\"1\"],\"statements\":[],\"movable\":null,\"deletable\":1,\"emphasized\":false,\"readOnly\":null,\"copyable\":true,\"extensions\":[]},null],\"statements\":[],\"movable\":null,\"deletable\":1,\"emphasized\":false,\"readOnly\":null,\"copyable\":true,\"extensions\":[]},{\"id\":\"0e0q\",\"x\":0,\"y\":0,\"type\":\"move_direction\",\"params\":[{\"id\":\"z5sj\",\"x\":0,\"y\":0,\"type\":\"number\",\"params\":[10],\"statements\":[],\"movable\":null,\"deletable\":1,\"emphasized\":false,\"readOnly\":null,\"copyable\":true,\"extensions\":[]},null],\"statements\":[],\"movable\":null,\"deletable\":1,\"emphasized\":false,\"readOnly\":null,\"copyable\":true,\"extensions\":[]},{\"id\":\"ldvg\",\"x\":0,\"y\":0,\"type\":\"_if\",\"params\":[{\"id\":\"n97n\",\"x\":0,\"y\":0,\"type\":\"boolean_basic_operator\",\"params\":[{\"id\":\"j6p5\",\"x\":0,\"y\":0,\"type\":\"get_variable\",\"params\":[\"bewa\",null],\"statements\":[],\"movable\":null,\"deletable\":1,\"emphasized\":false,\"readOnly\":null,\"copyable\":true,\"extensions\":[]},\"GREATER\",{\"id\":\"yfiu\",\"x\":0,\"y\":0,\"type\":\"text\",\"params\":[\"5\"],\"statements\":[],\"movable\":null,\"deletable\":1,\"emphasized\":false,\"readOnly\":null,\"copyable\":true,\"extensions\":[]}],\"statements\":[],\"movable\":null,\"deletable\":1,\"emphasized\":false,\"readOnly\":null,\"copyable\":true,\"extensions\":[]},null],\"statements\":[[{\"id\":\"4emu\",\"x\":0,\"y\":0,\"type\":\"wait_second\",\"params\":[{\"id\":\"u2va\",\"x\":0,\"y\":0,\"type\":\"number\",\"params\":[\"0.3\"],\"statements\":[],\"movable\":null,\"deletable\":1,\"emphasized\":false,\"readOnly\":null,\"copyable\":true,\"extensions\":[]},null],\"statements\":[],\"movable\":null,\"deletable\":1,\"emphasized\":false,\"readOnly\":null,\"copyable\":true,\"extensions\":[]}]],\"movable\":null,\"deletable\":1,\"emphasized\":false,\"readOnly\":null,\"copyable\":true,\"extensions\":[]}]],\"movable\":null,\"deletable\":1,\"emphasized\":false,\"readOnly\":null,\"copyable\":true,\"extensions\":[]}]]",
       "objectType": "sprite",
       "rotateMethod": "free",
       "scene": "7dwq",
@@ -17,7 +17,7 @@
               "scaleX": 0.3154574132492113,
               "scaleY": 0.3154574132492113
             },
-            "fileurl": "/lib/entry-js/images/media/entrybot1.png",
+            "fileurl": "./bower_components/entry-js/images/media/entrybot1.png",
             "name": "엔트리봇_걷기1",
             "scale": 100,
             "imageType": "png"
@@ -28,7 +28,7 @@
               "width": 284,
               "height": 350
             },
-            "fileurl": "/lib/entry-js/images/media/entrybot2.png",
+            "fileurl": "./bower_components/entry-js/images/media/entrybot2.png",
             "name": "엔트리봇_걷기2",
             "scale": 100,
             "imageType": "png"
@@ -39,7 +39,7 @@
             "duration": 1.3,
             "ext": ".mp3",
             "id": "8el5",
-            "fileurl": "/lib/entry-js/images/media/bark.mp3",
+            "fileurl": "./bower_components/entry-js/images/media/bark.mp3",
             "name": "강아지 짖는 소리"
           }
         ]
@@ -71,7 +71,7 @@
   "variables": [
     {
       "name": "변수",
-      "id": "p341",
+      "id": "bewa",
       "visible": true,
       "value": 0,
       "variableType": "variable",

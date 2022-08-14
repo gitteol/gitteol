@@ -1,3 +1,6 @@
+mod _if;
+mod boolean_basic_operator;
+mod change_variable;
 mod get_variable;
 mod length_of_string;
 mod move_direction;
@@ -15,6 +18,7 @@ use crate::{
 };
 
 use self::{
+    _if::If, boolean_basic_operator::BooleanBasicOperator, change_variable::ChangeVariable,
     get_variable::GetVariable, length_of_string::LengthOfString, move_direction::MoveDirection,
     repeat_basic::RepeatBasic, set_variable::SetVariable, wait_second::WaitSecond,
 };
@@ -28,6 +32,10 @@ pub(crate) enum BlockType {
     LengthOfString,
     SetVariable,
     GetVariable,
+    ChangeVariable,
+    #[serde(rename = "_if")]
+    If,
+    BooleanBasicOperator,
 }
 impl BlockType {
     pub(crate) fn new_block(&self) -> fn(&RawBlock) -> BlockVec {
@@ -38,6 +46,9 @@ impl BlockType {
             BlockType::LengthOfString => LengthOfString::new,
             BlockType::SetVariable => SetVariable::new,
             BlockType::GetVariable => GetVariable::new,
+            BlockType::ChangeVariable => ChangeVariable::new,
+            BlockType::If => If::new,
+            BlockType::BooleanBasicOperator => BooleanBasicOperator::new,
         }
     }
 }
