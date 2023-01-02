@@ -14,12 +14,6 @@ opt-level = 1
 [profile.dev.package."*"]
 opt-level = 3
 
-[workspace]
-resolver = "2"
-members = [
-  "block_macro",
-]
-
 [dependencies]
 bevy = "0.9.1"
 serde = { version = "1.0", features = ["derive"] }
@@ -27,6 +21,5 @@ serde_json = "1.0"
 anyhow = "1.0"
 dyn-clone = "1.0"
 dotent = "0.2.6"
-block_macro = { path = "block_macro" }
 strum = { version = "0.24", features = ["derive"] }
 enum_dispatch = "0.3.9"
