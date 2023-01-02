@@ -81,6 +81,7 @@ pub(crate) struct Resources<'a, 'b, 'c, 'd, 'e> {
     pub(crate) variables: &'a mut Query<'b, 'c, &'d mut Variable>,
 }
 
+#[derive(Resource)]
 pub(crate) struct Queue(pub(crate) VecDeque<CodeRunner>);
 
 pub(crate) fn execute_code(

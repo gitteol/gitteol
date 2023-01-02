@@ -28,6 +28,7 @@ impl LocalPos {
     }
 }
 
+#[derive(Resource)]
 pub(crate) struct Ids(HashMap<Id, Entity>);
 
 impl Ids {

@@ -56,15 +56,15 @@ pub(crate) fn spawn_variable(
     let position = variable.pos.to_variable_pos();
     let color = get_variable_color(&variable.variable_type);
 
-    let variable_entity = commands.spawn().insert(variable).id();
+    let variable_entity = commands.spawn_empty().insert(variable).id();
 
     ids.insert(id, variable_entity);
 
     commands
-        .spawn()
+        .spawn_empty()
         .insert(VariableUi(variable_entity))
         .insert(VariableUiType::Container)
-        .insert_bundle(NodeBundle {
+        .insert(NodeBundle {
             style: Style {
                 position_type: PositionType::Absolute,
                 position: UiRect {
@@ -75,12 +75,12 @@ pub(crate) fn spawn_variable(
                 display: Display::Flex,
                 ..Default::default()
             },
-            color: color.into(),
+            background_color: color.into(),
             ..Default::default()
         })
         .with_children(|parent| {
             parent
-                .spawn_bundle(TextBundle {
+                .spawn(TextBundle {
                     style: Style {
                         margin: UiRect::all(Val::Px(3.0)),
                         ..Default::default()

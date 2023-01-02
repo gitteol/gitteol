@@ -51,7 +51,7 @@ pub(crate) fn spawn_objects(
 
         let id: Id = object.id.clone().into();
         let entity = commands
-            .spawn_bundle(SpriteBundle {
+            .spawn(SpriteBundle {
                 texture: asset_server.load(&texture),
                 transform: Transform {
                     translation: Vec3::new(0.0, 0.0, 0.0),

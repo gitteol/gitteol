@@ -24,7 +24,7 @@ enum AppState {
     MainApp,
 }
 
-#[derive(Default)]
+#[derive(Default, Resource)]
 struct ProjectData {
     handle: Handle<EntryProject>,
 }
@@ -37,7 +37,7 @@ fn setup(
     project_data: Res<ProjectData>,
     mut ids: ResMut<Ids>,
 ) {
-    commands.spawn_bundle(Camera2dBundle::default());
+    commands.spawn(Camera2dBundle::default());
 
     let project = &project_assets.get(&project_data.handle).unwrap().0;
 
@@ -56,12 +56,11 @@ fn setup(
     }
 
     commands
-        .spawn_bundle(NodeBundle {
+        .spawn(NodeBundle {
             style: Style {
                 size: Size::new(Val::Percent(100.0), Val::Percent(100.0)),
                 ..Default::default()
             },
-            color: Color::NONE.into(),
             ..Default::default()
         })
         .push_children(&variable_ui_children);
@@ -73,17 +72,19 @@ fn setup(
 
 fn main() {
     App::new()
-        .insert_resource(WindowDescriptor {
-            title: "GitTeol".to_string(),
-            width: 480.0,
-            height: 270.0,
-            ..Default::default()
-        })
         .insert_resource(ClearColor(Color::rgb(1.0, 1.0, 1.0)))
         .insert_resource(Queue(VecDeque::new()))
         .init_resource::<ProjectData>()
         .insert_resource(Ids::new())
-        .add_plugins(DefaultPlugins)
+        .add_plugins(DefaultPlugins.set(WindowPlugin {
+            window: WindowDescriptor {
+                title: "GitTeol".to_string(),
+                width: 480.0,
+                height: 270.0,
+                ..Default::default()
+            },
+            ..Default::default()
+        }))
         .add_state(AppState::Loading)
         .add_system_set(SystemSet::on_enter(AppState::Loading).with_system(asset::setup_asset))
         .add_system_set(
