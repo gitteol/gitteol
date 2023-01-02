@@ -7,7 +7,7 @@ use crate::{
     code::{Code, Codes},
     common::{Id, Ids},
     event::EventType,
-    PROJECT_FILE,
+    PROJECT_FILE, WINDOW_SIZE,
 };
 
 #[derive(Component)]
@@ -58,11 +58,6 @@ pub(crate) fn spawn_objects(
         let entity = commands
             .spawn(SpriteBundle {
                 texture: asset_server.load(&texture),
-                // transform: Transform {
-                //     translation: Vec3::new(object.entity.x, object.entity.y, 0.0),
-                //     scale: Vec3::new(object.entity.scale_x, object.entity.scale_y, 1.0),
-                //     ..Default::default()
-                // },
                 ..Default::default()
             })
             .insert(Object {
@@ -80,7 +75,7 @@ pub(crate) fn spawn_objects(
 
 pub(crate) fn object_system(mut objects: Query<(&Object, &mut Transform)>) {
     for (object, mut transform) in &mut objects {
-        transform.translation = object.translation;
-        transform.scale = object.scale;
+        transform.translation = object.translation * WINDOW_SIZE;
+        transform.scale = object.scale * WINDOW_SIZE;
     }
 }

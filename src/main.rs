@@ -18,6 +18,9 @@ use object::spawn_objects;
 use variable::spawn_variable;
 
 const PROJECT_FILE: &str = "project.ent";
+const WINDOW_ASPECT_RATIO: f32 = 480.0 / 270.0;
+const ENTRY_WIDTH: f32 = 480.0;
+const WINDOW_SIZE: f32 = 1.0;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 enum AppState {
@@ -82,8 +85,9 @@ fn main() {
         .add_plugins(DefaultPlugins.set(WindowPlugin {
             window: WindowDescriptor {
                 title: "GitTeol".to_string(),
-                width: 480.0,
-                height: 270.0,
+                width: ENTRY_WIDTH * WINDOW_SIZE,
+                height: ENTRY_WIDTH * WINDOW_SIZE / WINDOW_ASPECT_RATIO,
+                resizable: false,
                 ..Default::default()
             },
             ..Default::default()
