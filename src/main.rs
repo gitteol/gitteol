@@ -1,6 +1,6 @@
 use std::collections::VecDeque;
 
-use asset::{EntryAssetLoader, EntryProject};
+use asset::{EntryAssetLoader, EntryFile, EntryProject};
 use bevy::{prelude::*, time::FixedTimestep};
 
 mod asset;
@@ -18,6 +18,8 @@ use event::{Event, EventType};
 use object::spawn_objects;
 use variable::spawn_variable;
 
+const PROJECT_FILE: &str = "project.ent";
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 enum AppState {
     Loading,
@@ -25,8 +27,8 @@ enum AppState {
 }
 
 #[derive(Default, Resource)]
-struct ProjectData {
-    handle: Handle<EntryProject>,
+struct EntryFileData {
+    handle: Handle<EntryFile>,
 }
 
 fn setup(
@@ -34,12 +36,15 @@ fn setup(
     asset_server: Res<AssetServer>,
     mut events: EventWriter<Event>,
     project_assets: Res<Assets<EntryProject>>,
-    project_data: Res<ProjectData>,
     mut ids: ResMut<Ids>,
 ) {
     commands.spawn(Camera2dBundle::default());
 
-    let project = &project_assets.get(&project_data.handle).unwrap().0;
+    // let project = &project_assets.get(&project_data.handle).unwrap().0;
+    let project = &project_assets
+        .get(&asset_server.load(&format!("{}#project", PROJECT_FILE)))
+        .unwrap()
+        .0;
 
     spawn_objects(&mut commands, &asset_server, &project.objects, &mut ids);
 
@@ -74,7 +79,7 @@ fn main() {
     App::new()
         .insert_resource(ClearColor(Color::rgb(1.0, 1.0, 1.0)))
         .insert_resource(Queue(VecDeque::new()))
-        .init_resource::<ProjectData>()
+        .init_resource::<EntryFileData>()
         .insert_resource(Ids::new())
         .add_plugins(DefaultPlugins.set(WindowPlugin {
             window: WindowDescriptor {
@@ -103,6 +108,7 @@ fn main() {
         )
         .add_event::<Event>()
         .add_asset::<EntryProject>()
+        .add_asset::<EntryFile>()
         .init_asset_loader::<EntryAssetLoader>()
         .run();
 }

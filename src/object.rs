@@ -7,6 +7,7 @@ use crate::{
     code::{Code, Codes},
     common::{Id, Ids},
     event::EventType,
+    PROJECT_FILE,
 };
 
 #[derive(Component)]
@@ -45,9 +46,12 @@ pub(crate) fn spawn_objects(
         // info!("{:#?}", codes);
 
         let texture = match &object.sprite.pictures[0].filename {
-            Some(f) => format!("project.ent#{}", f),
+            Some(f) => format!("{}#{}", PROJECT_FILE, f),
+            // Some(_) => format!("{}", PROJECT_FILE),
             None => "entrybot1.png".to_string(),
         };
+
+        info!("{}", texture);
 
         let id: Id = object.id.clone().into();
         let entity = commands
