@@ -2,8 +2,23 @@
 name = "gitteol"
 version = "0.1.0"
 edition = "2021"
+publish = false
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+# Enable a small amount of optimization in debug mode
+[profile.dev]
+opt-level = 1
+
+# Enable high optimizations for dependencies (incl. Bevy), but not for our code:
+[profile.dev.package."*"]
+opt-level = 3
+
+[workspace]
+resolver = "2"
+members = [
+  "block_macro",
+]
 
 [dependencies]
 bevy = "0.8"
@@ -11,3 +26,7 @@ serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 anyhow = "1.0"
 dyn-clone = "1.0"
+dotent = "0.2.6"
+block_macro = { path = "block_macro" }
+strum = { version = "0.24", features = ["derive"] }
+enum_dispatch = "0.3.9"

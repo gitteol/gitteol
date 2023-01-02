@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use strum::EnumString;
 
 use crate::{
     code::{CodeRunner, Codes, Queue},
@@ -6,8 +7,8 @@ use crate::{
     object::Object,
 };
 
-#[derive(PartialEq, Eq, Clone, Copy, Debug, serde::Deserialize)]
-#[serde(rename_all = "snake_case")]
+#[derive(PartialEq, Eq, Clone, Copy, Debug, EnumString)]
+#[strum(serialize_all = "snake_case")]
 pub(crate) enum EventType {
     WhenRunButtonClick,
 }

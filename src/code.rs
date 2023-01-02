@@ -13,7 +13,7 @@ use crate::{
 #[derive(Component)]
 pub(crate) struct Code {
     pub(crate) event: EventType,
-    pub(crate) blocks: Vec<Box<dyn Block + Send + Sync>>,
+    pub(crate) blocks: BlockVec,
 }
 
 #[derive(Component)]

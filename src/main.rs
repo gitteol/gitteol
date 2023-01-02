@@ -1,6 +1,6 @@
 use std::collections::VecDeque;
 
-use asset::ProjectAssetLoader;
+use asset::{EntryAssetLoader, EntryProject};
 use bevy::{prelude::*, time::FixedTimestep};
 
 mod asset;
@@ -9,14 +9,13 @@ mod code;
 mod common;
 mod event;
 mod object;
-mod project;
+// mod project;
 mod variable;
 
 use code::Queue;
 use common::Ids;
 use event::{Event, EventType};
 use object::spawn_objects;
-use project::RawProject;
 use variable::spawn_variable;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -27,21 +26,20 @@ enum AppState {
 
 #[derive(Default)]
 struct ProjectData {
-    handle: Handle<RawProject>,
+    handle: Handle<EntryProject>,
 }
 
 fn setup(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     mut events: EventWriter<Event>,
-    project_assets: Res<Assets<RawProject>>,
-    project_data: ResMut<ProjectData>,
+    project_assets: Res<Assets<EntryProject>>,
+    project_data: Res<ProjectData>,
+    mut ids: ResMut<Ids>,
 ) {
     commands.spawn_bundle(Camera2dBundle::default());
 
-    let mut ids = Ids::new();
-
-    let project = project_assets.get(&project_data.handle).unwrap();
+    let project = &project_assets.get(&project_data.handle).unwrap().0;
 
     spawn_objects(&mut commands, &asset_server, &project.objects, &mut ids);
 
@@ -52,7 +50,7 @@ fn setup(
         variable_ui_children.push(spawn_variable(
             &mut commands,
             font.clone(),
-            raw_variable.to_variable(),
+            raw_variable.clone().into(),
             &mut ids,
         ))
     }
@@ -67,8 +65,6 @@ fn setup(
             ..Default::default()
         })
         .push_children(&variable_ui_children);
-
-    commands.insert_resource(ids);
 
     events.send(Event {
         event_type: EventType::WhenRunButtonClick,
@@ -86,6 +82,7 @@ fn main() {
         .insert_resource(ClearColor(Color::rgb(1.0, 1.0, 1.0)))
         .insert_resource(Queue(VecDeque::new()))
         .init_resource::<ProjectData>()
+        .insert_resource(Ids::new())
         .add_plugins(DefaultPlugins)
         .add_state(AppState::Loading)
         .add_system_set(SystemSet::on_enter(AppState::Loading).with_system(asset::setup_asset))
@@ -104,7 +101,7 @@ fn main() {
                 .with_run_criteria(FixedTimestep::step(1.0 / 60.0)),
         )
         .add_event::<Event>()
-        .add_asset::<RawProject>()
-        .init_asset_loader::<ProjectAssetLoader>()
+        .add_asset::<EntryProject>()
+        .init_asset_loader::<EntryAssetLoader>()
         .run();
 }

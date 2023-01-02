@@ -1,9 +1,12 @@
+use std::str::FromStr;
+
 use bevy::prelude::*;
 
 use crate::{
+    blocks::BlockType,
     code::{Code, Codes},
     common::{Id, Ids},
-    project::{RawBlockType, RawObject, RawScript},
+    event::EventType,
 };
 
 #[derive(Component)]
@@ -17,31 +20,39 @@ pub(crate) enum ObjectType {
 pub(crate) fn spawn_objects(
     commands: &mut Commands,
     asset_server: &Res<AssetServer>,
-    objects: &Vec<RawObject>,
+    objects: &Vec<dotent::project::object::Object>,
     ids: &mut Ids,
 ) {
     for object in objects {
-        let script = RawScript::parse(&object.script).unwrap();
+        let script = &object.script;
         let mut codes = Vec::new();
-        for code in script.0 {
-            let event = match code[0].block_type {
-                RawBlockType::Event(event) => event,
-                _ => continue,
+        for code in &script.0 {
+            let event = match EventType::from_str(&code[0].block_type) {
+                Ok(event) => event,
+                Err(_) => continue,
             };
 
             let mut blocks = Vec::new();
             for raw_block in code.iter().skip(1) {
-                blocks.append(&mut raw_block.to_blocks());
+                if let Ok(block_type) = BlockType::from_str(&raw_block.block_type) {
+                    let mut block = block_type.new_block()(raw_block);
+                    blocks.append(&mut block);
+                }
             }
 
             codes.push(Code { event, blocks });
         }
         // info!("{:#?}", codes);
 
-        let id = Id::from_str(&object.id);
+        let texture = match &object.sprite.pictures[0].filename {
+            Some(f) => format!("project.ent#{}", f),
+            None => "entrybot1.png".to_string(),
+        };
+
+        let id: Id = object.id.clone().into();
         let entity = commands
             .spawn_bundle(SpriteBundle {
-                texture: asset_server.load("entrybot1.png"),
+                texture: asset_server.load(&texture),
                 transform: Transform {
                     translation: Vec3::new(0.0, 0.0, 0.0),
                     scale: Vec3::new(0.315, 0.315, 1.0),

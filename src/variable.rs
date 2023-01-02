@@ -1,39 +1,39 @@
 use bevy::prelude::*;
-use serde::Deserialize;
+use dotent::project::variable::VariableType;
 
 use crate::{
     blocks::Value,
     common::{Id, Ids, LocalPos},
 };
 
-#[derive(Clone, Copy, Deserialize, Debug)]
-pub(crate) enum VariableType {
-    #[serde(rename = "variable")]
-    Normal,
-    #[serde(rename = "timer")]
-    Timer,
-    #[serde(rename = "answer")]
-    Answer,
-}
-
-impl VariableType {
-    fn get_color(&self) -> Color {
-        match self {
-            VariableType::Normal => Color::rgb(0.36, 0.50, 0.97),
-            VariableType::Timer => Color::rgb(0.92, 0.70, 0.26),
-            VariableType::Answer => Color::rgb(0.90, 0.51, 0.92),
-        }
+fn get_variable_color(variable_type: &VariableType) -> Color {
+    match variable_type {
+        VariableType::Variable | VariableType::List => Color::rgb(0.36, 0.50, 0.97),
+        VariableType::Timer => Color::rgb(0.92, 0.70, 0.26),
+        VariableType::Answer => Color::rgb(0.90, 0.51, 0.92),
     }
 }
 
 #[derive(Component, Clone)]
 pub(crate) struct Variable {
     pub(crate) id: Id,
-    pub(crate) variable_type: VariableType,
+    pub(crate) variable_type: dotent::project::variable::VariableType,
     pub(crate) name: String,
     pub(crate) value: Value,
     pub(crate) visible: bool,
     pub(crate) pos: LocalPos,
+}
+impl From<dotent::project::variable::Variable> for Variable {
+    fn from(value: dotent::project::variable::Variable) -> Self {
+        Variable {
+            id: value.id.into(),
+            variable_type: value.variable_type,
+            name: value.name,
+            value: value.value.into(),
+            visible: value.visible,
+            pos: LocalPos::new(value.x, value.y),
+        }
+    }
 }
 
 #[derive(Component)]
@@ -54,7 +54,7 @@ pub(crate) fn spawn_variable(
     let id = variable.id.clone();
     let name = variable.name.clone();
     let position = variable.pos.to_variable_pos();
-    let color = variable.variable_type.get_color();
+    let color = get_variable_color(&variable.variable_type);
 
     let variable_entity = commands.spawn().insert(variable).id();
 

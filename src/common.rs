@@ -11,6 +11,11 @@ impl Id {
         Id(id.to_string())
     }
 }
+impl From<dotent::project::common::Id> for Id {
+    fn from(value: dotent::project::common::Id) -> Self {
+        Id::from_str(value.as_str())
+    }
+}
 
 #[derive(Component, Clone)]
 pub(crate) struct LocalPos(f32, f32);

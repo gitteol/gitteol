@@ -1,10 +1,9 @@
 use crate::{
     code::{Memory, Resources},
     common::Id,
-    project::RawBlock,
 };
 
-use super::{Block, BlockReturn, BlockVec, Value};
+use super::{parse_param, Block, BlockReturn, BlockVec, Value};
 
 #[derive(Clone)]
 pub(crate) struct BooleanBasicOperator {
@@ -48,17 +47,27 @@ impl Block for BooleanBasicOperator {
     }
 }
 impl BooleanBasicOperator {
-    pub(crate) fn new(block: &RawBlock) -> BlockVec {
+    pub(crate) fn new(block: &dotent::project::script::Block) -> BlockVec {
         let mut blocks: BlockVec = Vec::new();
-        let left = block.params[0].to_arg(&mut blocks).unwrap();
-        let op = block.params[1].to_arg(&mut blocks).unwrap();
-        let right = block.params[2].to_arg(&mut blocks).unwrap();
-        blocks.push(Box::new(BooleanBasicOperator {
-            id: Id::from_str(&block.id),
-            left,
-            op,
-            right,
-        }));
+
+        let (left, mut param_blocks) = parse_param(&block.params[0]).unwrap();
+        blocks.append(&mut param_blocks);
+
+        let (op, mut param_blocks) = parse_param(&block.params[1]).unwrap();
+        blocks.append(&mut param_blocks);
+
+        let (right, mut param_blocks) = parse_param(&block.params[2]).unwrap();
+        blocks.append(&mut param_blocks);
+
+        blocks.push(
+            BooleanBasicOperator {
+                id: block.id.clone().into(),
+                left,
+                op,
+                right,
+            }
+            .into(),
+        );
         blocks
     }
 }

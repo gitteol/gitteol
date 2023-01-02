@@ -1,10 +1,9 @@
 use crate::{
     code::{Memory, Resources},
     common::Id,
-    project::RawBlock,
 };
 
-use super::{Block, BlockReturn, BlockVec, Value};
+use super::{parse_param, Block, BlockReturn, BlockVec, Value};
 
 #[derive(Clone)]
 pub(crate) struct WaitSecond {
@@ -49,13 +48,19 @@ impl Block for WaitSecond {
     }
 }
 impl WaitSecond {
-    pub(crate) fn new(block: &RawBlock) -> BlockVec {
+    pub(crate) fn new(block: &dotent::project::script::Block) -> BlockVec {
         let mut blocks: BlockVec = Vec::new();
-        let second = block.params[0].to_arg(&mut blocks).unwrap();
-        blocks.push(Box::new(WaitSecond {
-            id: Id::from_str(&block.id),
-            second,
-        }));
+
+        let (second, mut param_blocks) = parse_param(&block.params[0]).unwrap();
+        blocks.append(&mut param_blocks);
+
+        blocks.push(
+            WaitSecond {
+                id: block.id.clone().into(),
+                second,
+            }
+            .into(),
+        );
         blocks
     }
 }

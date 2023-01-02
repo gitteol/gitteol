@@ -1,10 +1,9 @@
 use crate::{
     code::{Memory, Resources},
     common::Id,
-    project::RawBlock,
 };
 
-use super::{Block, BlockReturn, BlockVec};
+use super::{parse_param, Block, BlockReturn, BlockVec};
 
 #[derive(Clone)]
 pub(crate) struct GetVariable {
@@ -28,17 +27,21 @@ impl Block for GetVariable {
     }
 }
 impl GetVariable {
-    pub(crate) fn new(block: &RawBlock) -> BlockVec {
+    pub(crate) fn new(block: &dotent::project::script::Block) -> BlockVec {
         let mut blocks: BlockVec = Vec::new();
-        let variable_id = block.params[0]
-            .to_arg(&mut blocks)
-            .unwrap()
-            .as_string()
-            .unwrap();
-        blocks.push(Box::new(GetVariable {
-            id: Id::from_str(&block.id),
-            variable_id,
-        }));
+
+        let (variable_id, mut param_blocks) = parse_param(&block.params[0]).unwrap();
+        blocks.append(&mut param_blocks);
+
+        let variable_id = variable_id.as_string().unwrap();
+
+        blocks.push(
+            GetVariable {
+                id: block.id.clone().into(),
+                variable_id,
+            }
+            .into(),
+        );
         blocks
     }
 }

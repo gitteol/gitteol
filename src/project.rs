@@ -2,7 +2,7 @@ use bevy::reflect::TypeUuid;
 use serde::Deserialize;
 
 use crate::{
-    blocks::{BlockType, BlockVec, LiteralBlockType, Value},
+    blocks::{BlockEnum, BlockVec, LiteralBlockType, Value},
     common::{Id, LocalPos},
     event::EventType,
     variable::{Variable, VariableType},
@@ -65,8 +65,7 @@ impl RawBlock {
     }
 }
 
-#[derive(Deserialize, Debug)]
-#[serde(untagged)]
+#[derive(Debug)]
 pub(crate) enum RawBlockType {
     Normal(BlockType),
     Event(EventType),

@@ -1,10 +1,9 @@
 use crate::{
     code::{Memory, Resources},
     common::Id,
-    project::RawBlock,
 };
 
-use super::{Block, BlockReturn, BlockVec, Value};
+use super::{parse_param, Block, BlockReturn, BlockVec, Value};
 
 #[derive(Clone)]
 pub(crate) struct LengthOfString {
@@ -34,13 +33,19 @@ impl Block for LengthOfString {
     }
 }
 impl LengthOfString {
-    pub(crate) fn new(block: &RawBlock) -> BlockVec {
+    pub(crate) fn new(block: &dotent::project::script::Block) -> BlockVec {
         let mut blocks: BlockVec = Vec::new();
-        let value = block.params[0].to_arg(&mut blocks).unwrap();
-        blocks.push(Box::new(LengthOfString {
-            id: Id::from_str(&block.id),
-            value,
-        }));
+
+        let (value, mut param_blocks) = parse_param(&block.params[0]).unwrap();
+        blocks.append(&mut param_blocks);
+
+        blocks.push(
+            LengthOfString {
+                id: block.id.clone().into(),
+                value,
+            }
+            .into(),
+        );
         blocks
     }
 }

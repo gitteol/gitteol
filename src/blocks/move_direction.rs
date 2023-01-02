@@ -1,10 +1,9 @@
 use crate::{
     code::{Memory, Resources},
     common::Id,
-    project::RawBlock,
 };
 
-use super::{Block, BlockReturn, BlockVec, Value};
+use super::{parse_param, Block, BlockReturn, BlockVec, Value};
 
 #[derive(Clone)]
 pub(crate) struct MoveDirection {
@@ -29,13 +28,17 @@ impl Block for MoveDirection {
     }
 }
 impl MoveDirection {
-    pub(crate) fn new(block: &RawBlock) -> BlockVec {
+    pub(crate) fn new(block: &dotent::project::script::Block) -> BlockVec {
         let mut blocks: BlockVec = Vec::new();
-        let amount = block.params[0].to_arg(&mut blocks).unwrap();
-        blocks.push(Box::new(MoveDirection {
-            id: Id::from_str(&block.id),
-            amount,
-        }));
+        let (amount, mut param_blocks) = parse_param(&block.params[0]).unwrap();
+        blocks.append(&mut param_blocks);
+        blocks.push(
+            MoveDirection {
+                id: block.id.clone().into(),
+                amount,
+            }
+            .into(),
+        );
         blocks
     }
 }
