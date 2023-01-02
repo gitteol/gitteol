@@ -1,5 +1,5 @@
 use crate::{
-    code::{Memory, Resources},
+    code::{Context, Memory},
     common::Id,
 };
 
@@ -11,7 +11,7 @@ pub(crate) struct LengthOfString {
     value: Value,
 }
 impl Block for LengthOfString {
-    fn run(&self, pointer: usize, memory: &mut Memory, _res: &mut Resources) -> BlockReturn {
+    fn run(&self, pointer: usize, memory: &mut Memory, _ctx: &mut Context) -> BlockReturn {
         let length = self
             .value
             .to_raw_value(memory)

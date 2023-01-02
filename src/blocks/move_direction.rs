@@ -1,5 +1,5 @@
 use crate::{
-    code::{Memory, Resources},
+    code::{Context, Memory},
     common::Id,
 };
 
@@ -11,14 +11,14 @@ pub(crate) struct MoveDirection {
     amount: Value,
 }
 impl Block for MoveDirection {
-    fn run(&self, pointer: usize, memory: &mut Memory, res: &mut Resources) -> BlockReturn {
+    fn run(&self, pointer: usize, memory: &mut Memory, ctx: &mut Context) -> BlockReturn {
         let amount = self
             .amount
             .to_raw_value(memory)
             .unwrap()
             .as_number()
             .unwrap();
-        res.object.transform.translation.x += amount;
+        ctx.object.translation.x += amount;
 
         BlockReturn::basic(pointer)
     }

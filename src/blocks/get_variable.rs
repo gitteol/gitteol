@@ -1,5 +1,5 @@
 use crate::{
-    code::{Memory, Resources},
+    code::{Context, Memory},
     common::Id,
 };
 
@@ -11,9 +11,9 @@ pub(crate) struct GetVariable {
     variable_id: String,
 }
 impl Block for GetVariable {
-    fn run(&self, pointer: usize, _memory: &mut Memory, res: &mut Resources) -> BlockReturn {
-        let variable_entity = res.ids.get(&Id::from_str(&self.variable_id)).unwrap();
-        let variable = res.variables.get(*variable_entity).unwrap();
+    fn run(&self, pointer: usize, _memory: &mut Memory, ctx: &mut Context) -> BlockReturn {
+        let variable_entity = ctx.ids.get(&Id::from_str(&self.variable_id)).unwrap();
+        let variable = ctx.variables.get(*variable_entity).unwrap();
 
         BlockReturn {
             pointer: pointer + 1,

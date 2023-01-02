@@ -11,7 +11,10 @@ use crate::{
 };
 
 #[derive(Component)]
-pub(crate) struct Object;
+pub(crate) struct Object {
+    pub(crate) translation: Vec3,
+    pub(crate) scale: Vec3,
+}
 
 #[derive(Component)]
 pub(crate) enum ObjectType {
@@ -55,19 +58,29 @@ pub(crate) fn spawn_objects(
         let entity = commands
             .spawn(SpriteBundle {
                 texture: asset_server.load(&texture),
-                transform: Transform {
-                    translation: Vec3::new(0.0, 0.0, 0.0),
-                    scale: Vec3::new(0.315, 0.315, 1.0),
-                    ..Default::default()
-                },
+                // transform: Transform {
+                //     translation: Vec3::new(object.entity.x, object.entity.y, 0.0),
+                //     scale: Vec3::new(object.entity.scale_x, object.entity.scale_y, 1.0),
+                //     ..Default::default()
+                // },
                 ..Default::default()
             })
-            .insert(Object)
+            .insert(Object {
+                translation: Vec3::new(object.entity.x, object.entity.y, 0.0),
+                scale: Vec3::new(object.entity.scale_x, object.entity.scale_y, 1.0),
+            })
             .insert(id.clone())
             .insert(ObjectType::Sprite)
             .insert(Codes(codes))
             .id();
 
         ids.insert(id, entity);
+    }
+}
+
+pub(crate) fn object_system(mut objects: Query<(&Object, &mut Transform)>) {
+    for (object, mut transform) in &mut objects {
+        transform.translation = object.translation;
+        transform.scale = object.scale;
     }
 }

@@ -1,5 +1,5 @@
 use crate::{
-    code::{Memory, Resources},
+    code::{Context, Memory},
     common::Id,
 };
 
@@ -11,7 +11,7 @@ pub(crate) struct WaitSecond {
     second: Value,
 }
 impl Block for WaitSecond {
-    fn run(&self, pointer: usize, memory: &mut Memory, res: &mut Resources) -> BlockReturn {
+    fn run(&self, pointer: usize, memory: &mut Memory, ctx: &mut Context) -> BlockReturn {
         let second = self
             .second
             .to_raw_value(memory)
@@ -25,7 +25,7 @@ impl Block for WaitSecond {
             .as_number_mut()
             .unwrap();
 
-        *delta += res.time.delta_seconds();
+        *delta += ctx.time.delta_seconds();
 
         if *delta >= second {
             memory.remove(&self.id, "delta");

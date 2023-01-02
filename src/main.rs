@@ -97,7 +97,8 @@ fn main() {
         .add_system_set(
             SystemSet::on_update(AppState::MainApp)
                 .with_system(event::event_listener)
-                .with_system(variable::variable_ui_system),
+                .with_system(variable::variable_ui_system)
+                .with_system(object::object_system),
         )
         .add_system_set(
             SystemSet::on_update(AppState::MainApp)

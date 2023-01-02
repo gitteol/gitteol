@@ -1,5 +1,5 @@
 use crate::{
-    code::{Memory, Resources},
+    code::{Context, Memory},
     common::Id,
 };
 
@@ -13,7 +13,7 @@ pub(crate) struct BooleanBasicOperator {
     right: Value,
 }
 impl Block for BooleanBasicOperator {
-    fn run(&self, pointer: usize, memory: &mut Memory, _res: &mut Resources) -> BlockReturn {
+    fn run(&self, pointer: usize, memory: &mut Memory, _ctx: &mut Context) -> BlockReturn {
         let left = self.left.to_raw_value(memory).unwrap();
         let op = self.op.to_raw_value(memory).unwrap().as_string().unwrap();
         let right = self.right.to_raw_value(memory).unwrap();

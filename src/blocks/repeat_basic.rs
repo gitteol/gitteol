@@ -1,5 +1,5 @@
 use crate::{
-    code::{Memory, Resources},
+    code::{Context, Memory},
     common::Id,
 };
 
@@ -12,7 +12,7 @@ pub(crate) struct RepeatBasic {
     statements_length: usize,
 }
 impl Block for RepeatBasic {
-    fn run(&self, pointer: usize, memory: &mut Memory, _res: &mut Resources) -> BlockReturn {
+    fn run(&self, pointer: usize, memory: &mut Memory, _ctx: &mut Context) -> BlockReturn {
         let iter_num = self
             .iter_num
             .to_raw_value(memory)
@@ -81,7 +81,7 @@ pub(crate) struct RepeatBasicEnd {
     statements_length: usize,
 }
 impl Block for RepeatBasicEnd {
-    fn run(&self, pointer: usize, _memory: &mut Memory, _res: &mut Resources) -> BlockReturn {
+    fn run(&self, pointer: usize, _memory: &mut Memory, _res: &mut Context) -> BlockReturn {
         BlockReturn {
             pointer: pointer - self.statements_length - 1,
             is_continue: true,

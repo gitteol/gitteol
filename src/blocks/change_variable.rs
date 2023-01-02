@@ -1,5 +1,5 @@
 use crate::{
-    code::{Memory, Resources},
+    code::{Context, Memory},
     common::Id,
 };
 
@@ -12,11 +12,11 @@ pub(crate) struct ChangeVariable {
     value: Value,
 }
 impl Block for ChangeVariable {
-    fn run(&self, pointer: usize, memory: &mut Memory, res: &mut Resources) -> BlockReturn {
-        let variable_entity = res.ids.get(&Id::from_str(&self.variable_id)).unwrap();
+    fn run(&self, pointer: usize, memory: &mut Memory, ctx: &mut Context) -> BlockReturn {
+        let variable_entity = ctx.ids.get(&Id::from_str(&self.variable_id)).unwrap();
         let value = self.value.to_raw_value(memory).unwrap();
 
-        let mut variable = res.variables.get_mut(*variable_entity).unwrap();
+        let mut variable = ctx.variables.get_mut(*variable_entity).unwrap();
 
         if variable.value.as_number().is_ok() && value.as_number().is_ok() {
             *variable.value.as_number_mut().unwrap() += value.as_number().unwrap();

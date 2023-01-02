@@ -1,5 +1,5 @@
 use crate::{
-    code::{Memory, Resources},
+    code::{Context, Memory},
     common::Id,
 };
 
@@ -12,7 +12,7 @@ pub(crate) struct If {
     statements_length: usize,
 }
 impl Block for If {
-    fn run(&self, pointer: usize, memory: &mut Memory, _res: &mut Resources) -> BlockReturn {
+    fn run(&self, pointer: usize, memory: &mut Memory, _ctx: &mut Context) -> BlockReturn {
         let condition = self
             .condition
             .to_raw_value(memory)

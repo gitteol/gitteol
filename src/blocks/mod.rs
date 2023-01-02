@@ -15,7 +15,7 @@ use enum_dispatch::enum_dispatch;
 use strum::{EnumDiscriminants, EnumString};
 
 use crate::{
-    code::{Memory, Resources},
+    code::{Context, Memory},
     common::Id,
 };
 
@@ -183,6 +183,6 @@ pub(crate) type BlockVec = Vec<BlockEnum>;
 
 #[enum_dispatch(BlockEnum)]
 pub(crate) trait Block {
-    fn run(&self, pointer: usize, memory: &mut Memory, res: &mut Resources) -> BlockReturn;
+    fn run(&self, pointer: usize, memory: &mut Memory, ctx: &mut Context) -> BlockReturn;
     fn get_id(&self) -> &Id;
 }

@@ -1,6 +1,6 @@
 use std::collections::{HashMap, VecDeque};
 
-use bevy::{ecs::query::WorldQuery, prelude::*};
+use bevy::prelude::*;
 
 use crate::{
     blocks::{Block, BlockVec, Value},
@@ -68,16 +68,10 @@ impl CodeRunner {
     }
 }
 
-#[derive(WorldQuery)]
-#[world_query(mutable)]
-pub(crate) struct ObjectQuery<'w> {
-    pub(crate) transform: &'w mut Transform,
-}
-
-pub(crate) struct Resources<'a, 'b, 'c, 'd, 'e> {
+pub(crate) struct Context<'a, 'b, 'c, 'd> {
     pub(crate) time: &'a Res<'a, Time>,
     pub(crate) ids: &'a Res<'a, Ids>,
-    pub(crate) object: &'a mut ObjectQueryItem<'a, 'e>,
+    pub(crate) object: &'a mut Object,
     pub(crate) variables: &'a mut Query<'b, 'c, &'d mut Variable>,
 }
 
@@ -88,7 +82,7 @@ pub(crate) fn execute_code(
     mut queue: ResMut<Queue>,
     time: Res<Time>,
     ids: Res<Ids>,
-    mut objects: Query<ObjectQuery, With<Object>>,
+    mut objects: Query<&mut Object>,
     mut variables: Query<&mut Variable>,
 ) {
     let mut new_queue: VecDeque<CodeRunner> = VecDeque::new();
@@ -105,7 +99,7 @@ pub(crate) fn execute_code(
 
         let mut this_object = objects.get_mut(*owner_entity).unwrap();
 
-        let mut res = Resources {
+        let mut ctx = Context {
             time: &time,
             ids: &ids,
             object: &mut this_object,
@@ -113,7 +107,7 @@ pub(crate) fn execute_code(
         };
 
         while let Some(block) = code.get_mut(pointer) {
-            let block_return = block.run(pointer, &mut memory, &mut res);
+            let block_return = block.run(pointer, &mut memory, &mut ctx);
             pointer = block_return.pointer;
             if let Some(return_value) = block_return.return_value {
                 memory.insert(block.get_id(), "return_value", return_value);
