@@ -51,17 +51,17 @@ pub(crate) enum BlockEnum {
     BooleanBasicOperator,
 }
 impl BlockType {
-    pub(crate) fn new_block(&self) -> fn(&dotent::project::script::Block) -> BlockVec {
+    pub(crate) fn build(&self, block: &dotent::project::script::Block) -> BlockVec {
         match self {
-            BlockType::MoveDirection => MoveDirection::new,
-            BlockType::WaitSecond => WaitSecond::new,
-            BlockType::RepeatBasic => RepeatBasic::new,
-            BlockType::LengthOfString => LengthOfString::new,
-            BlockType::SetVariable => SetVariable::new,
-            BlockType::GetVariable => GetVariable::new,
-            BlockType::ChangeVariable => ChangeVariable::new,
-            BlockType::If => If::new,
-            BlockType::BooleanBasicOperator => BooleanBasicOperator::new,
+            BlockType::MoveDirection => MoveDirection::build(block),
+            BlockType::WaitSecond => WaitSecond::build(block),
+            BlockType::RepeatBasic => RepeatBasic::build(block),
+            BlockType::LengthOfString => LengthOfString::build(block),
+            BlockType::SetVariable => SetVariable::build(block),
+            BlockType::GetVariable => GetVariable::build(block),
+            BlockType::ChangeVariable => ChangeVariable::build(block),
+            BlockType::If => If::build(block),
+            BlockType::BooleanBasicOperator => BooleanBasicOperator::build(block),
             BlockType::RepeatBasicEnd => unreachable!(),
         }
     }
@@ -133,11 +133,11 @@ fn parse_param(param: &Param) -> Option<(Value, BlockVec)> {
     let val = match param {
         Param::Block(block) => {
             if let Ok(block_type) = BlockType::from_str(&block.block_type) {
-                let mut param_blocks = block_type.new_block()(&block);
+                let mut param_blocks = block_type.build(block);
                 let last_id = param_blocks.last().unwrap().get_id().clone();
                 blocks.append(&mut param_blocks);
                 Value::Memory((last_id, "return_value".to_string()))
-            } else if let Ok(_) = LiteralBlockType::from_str(&block.block_type) {
+            } else if LiteralBlockType::from_str(&block.block_type).is_ok() {
                 return parse_param(&block.params[0]);
             } else {
                 unreachable!()
@@ -156,7 +156,7 @@ fn parse_statements(script: &dotent::project::script::Script) -> Vec<BlockVec> {
         let mut blocks = Vec::new();
         for block in code {
             if let Ok(block_type) = BlockType::from_str(&block.block_type) {
-                blocks.append(&mut block_type.new_block()(&block));
+                blocks.append(&mut block_type.build(block));
             }
         }
         codes.push(blocks);

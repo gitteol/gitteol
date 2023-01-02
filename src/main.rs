@@ -9,7 +9,6 @@ mod code;
 mod common;
 mod event;
 mod object;
-// mod project;
 mod variable;
 
 use code::Queue;
@@ -40,9 +39,8 @@ fn setup(
 ) {
     commands.spawn(Camera2dBundle::default());
 
-    // let project = &project_assets.get(&project_data.handle).unwrap().0;
     let project = &project_assets
-        .get(&asset_server.load(&format!("{}#project", PROJECT_FILE)))
+        .get(&asset_server.load(format!("{}#project", PROJECT_FILE)))
         .unwrap()
         .0;
 

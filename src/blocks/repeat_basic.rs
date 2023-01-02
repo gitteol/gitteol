@@ -46,7 +46,7 @@ impl Block for RepeatBasic {
     }
 }
 impl RepeatBasic {
-    pub(crate) fn new(block: &dotent::project::script::Block) -> BlockVec {
+    pub(crate) fn build(block: &dotent::project::script::Block) -> BlockVec {
         let mut blocks: BlockVec = Vec::new();
 
         let (iter_num, mut param_blocks) = parse_param(&block.params[0]).unwrap();

@@ -36,18 +36,16 @@ pub(crate) fn spawn_objects(
             let mut blocks = Vec::new();
             for raw_block in code.iter().skip(1) {
                 if let Ok(block_type) = BlockType::from_str(&raw_block.block_type) {
-                    let mut block = block_type.new_block()(raw_block);
+                    let mut block = block_type.build(raw_block);
                     blocks.append(&mut block);
                 }
             }
 
             codes.push(Code { event, blocks });
         }
-        // info!("{:#?}", codes);
 
         let texture = match &object.sprite.pictures[0].filename {
             Some(f) => format!("{}#{}", PROJECT_FILE, f),
-            // Some(_) => format!("{}", PROJECT_FILE),
             None => "entrybot1.png".to_string(),
         };
 

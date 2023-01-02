@@ -33,7 +33,7 @@ impl Block for LengthOfString {
     }
 }
 impl LengthOfString {
-    pub(crate) fn new(block: &dotent::project::script::Block) -> BlockVec {
+    pub(crate) fn build(block: &dotent::project::script::Block) -> BlockVec {
         let mut blocks: BlockVec = Vec::new();
 
         let (value, mut param_blocks) = parse_param(&block.params[0]).unwrap();

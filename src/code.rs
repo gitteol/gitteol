@@ -116,7 +116,7 @@ pub(crate) fn execute_code(
             let block_return = block.run(pointer, &mut memory, &mut res);
             pointer = block_return.pointer;
             if let Some(return_value) = block_return.return_value {
-                memory.insert(&block.get_id(), "return_value", return_value);
+                memory.insert(block.get_id(), "return_value", return_value);
             }
             info!("pointer: {}, memory: {:?}", pointer, memory);
             if block_return.is_continue {

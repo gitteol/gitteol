@@ -1,9 +1,8 @@
 use std::collections::HashMap;
 
 use bevy::prelude::*;
-use serde::Deserialize;
 
-#[derive(Component, Debug, Clone, PartialEq, Eq, Hash, Deserialize)]
+#[derive(Component, Debug, Clone, PartialEq, Eq, Hash)]
 pub(crate) struct Id(pub(crate) String);
 
 impl Id {
