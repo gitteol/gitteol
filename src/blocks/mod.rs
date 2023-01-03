@@ -6,6 +6,7 @@ mod get_variable;
 mod length_of_string;
 mod move_direction;
 mod move_x;
+mod move_xy_time;
 mod move_y;
 mod repeat_basic;
 mod repeat_inf;
@@ -33,6 +34,7 @@ use self::{
     length_of_string::LengthOfString,
     move_direction::MoveDirection,
     move_x::MoveX,
+    move_xy_time::MoveXYTime,
     move_y::MoveY,
     repeat_basic::{RepeatBasic, RepeatBasicEnd},
     repeat_inf::RepeatInf,
@@ -62,6 +64,7 @@ pub(crate) enum BlockEnum {
     MoveY,
     RepeatInf,
     CalcBasic,
+    MoveXYTime,
 }
 impl BlockType {
     pub(crate) fn build(&self, block: &dotent::project::script::Block) -> BlockVec {
@@ -80,6 +83,7 @@ impl BlockType {
             BlockType::MoveX => MoveX::build(block),
             BlockType::MoveY => MoveY::build(block),
             BlockType::CalcBasic => CalcBasic::build(block),
+            BlockType::MoveXYTime => MoveXYTime::build(block),
         }
     }
 }

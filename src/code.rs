@@ -112,7 +112,17 @@ pub(crate) fn execute_code(
             if let Some(return_value) = block_return.return_value {
                 memory.insert(block.get_id(), "return_value", return_value);
             }
-            info!("pointer: {}, memory: {:?}", pointer, memory);
+
+            info!(
+                "OBJECT: {:?}, CODE: {}, POINTER: {} MEMORY: {:#?}",
+                owner_entity,
+                code.first()
+                    .map(|c| c.get_id().0.clone())
+                    .unwrap_or_else(|| "None".to_string()),
+                pointer,
+                memory.0
+            );
+
             if block_return.is_continue {
                 new_queue.push_back(CodeRunner {
                     code,
