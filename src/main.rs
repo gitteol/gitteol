@@ -39,6 +39,7 @@ fn setup(
     mut events: EventWriter<Event>,
     project_assets: Res<Assets<EntryProject>>,
     mut ids: ResMut<Ids>,
+    mut windows: ResMut<Windows>,
 ) {
     commands.spawn(Camera2dBundle::default());
 
@@ -46,6 +47,9 @@ fn setup(
         .get(&asset_server.load(format!("{}#project", PROJECT_FILE)))
         .unwrap()
         .0;
+
+    let window = windows.primary_mut();
+    window.set_title(format!("{}", project.name));
 
     spawn_objects(&mut commands, &asset_server, &project.objects, &mut ids);
 
@@ -84,7 +88,7 @@ fn main() {
         .insert_resource(Ids::new())
         .add_plugins(DefaultPlugins.set(WindowPlugin {
             window: WindowDescriptor {
-                title: "GitTeol".to_string(),
+                title: "깃털".to_string(),
                 width: ENTRY_WIDTH * WINDOW_SIZE,
                 height: ENTRY_WIDTH * WINDOW_SIZE / WINDOW_ASPECT_RATIO,
                 resizable: false,
