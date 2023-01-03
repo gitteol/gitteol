@@ -4,6 +4,7 @@ mod change_variable;
 mod get_variable;
 mod length_of_string;
 mod move_direction;
+mod move_x;
 mod repeat_basic;
 mod set_variable;
 mod wait_second;
@@ -26,6 +27,7 @@ use self::{
     get_variable::GetVariable,
     length_of_string::LengthOfString,
     move_direction::MoveDirection,
+    move_x::MoveX,
     repeat_basic::{RepeatBasic, RepeatBasicEnd},
     set_variable::SetVariable,
     wait_second::WaitSecond,
@@ -49,6 +51,7 @@ pub(crate) enum BlockEnum {
     #[strum(serialize = "_if")]
     If,
     BooleanBasicOperator,
+    MoveX,
 }
 impl BlockType {
     pub(crate) fn build(&self, block: &dotent::project::script::Block) -> BlockVec {
@@ -56,13 +59,14 @@ impl BlockType {
             BlockType::MoveDirection => MoveDirection::build(block),
             BlockType::WaitSecond => WaitSecond::build(block),
             BlockType::RepeatBasic => RepeatBasic::build(block),
+            BlockType::RepeatBasicEnd => unreachable!(),
             BlockType::LengthOfString => LengthOfString::build(block),
             BlockType::SetVariable => SetVariable::build(block),
             BlockType::GetVariable => GetVariable::build(block),
             BlockType::ChangeVariable => ChangeVariable::build(block),
             BlockType::If => If::build(block),
             BlockType::BooleanBasicOperator => BooleanBasicOperator::build(block),
-            BlockType::RepeatBasicEnd => unreachable!(),
+            BlockType::MoveX => MoveX::build(block),
         }
     }
 }
