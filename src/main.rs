@@ -49,7 +49,7 @@ fn setup(
         .0;
 
     let window = windows.primary_mut();
-    window.set_title(format!("{}", project.name));
+    window.set_title(project.name.to_string());
 
     spawn_objects(&mut commands, &asset_server, &project.objects, &mut ids);
 

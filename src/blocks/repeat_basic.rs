@@ -77,8 +77,8 @@ impl RepeatBasic {
 
 #[derive(Clone)]
 pub(crate) struct RepeatBasicEnd {
-    id: Id,
-    statements_length: usize,
+    pub(crate) id: Id,
+    pub(crate) statements_length: usize,
 }
 impl Block for RepeatBasicEnd {
     fn run(&self, pointer: usize, _memory: &mut Memory, _res: &mut Context) -> BlockReturn {

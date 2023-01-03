@@ -1,5 +1,6 @@
 mod _if;
 mod boolean_basic_operator;
+mod calc_basic;
 mod change_variable;
 mod get_variable;
 mod length_of_string;
@@ -7,11 +8,13 @@ mod move_direction;
 mod move_x;
 mod move_y;
 mod repeat_basic;
+mod repeat_inf;
 mod set_variable;
 mod wait_second;
 
 use std::str::FromStr;
 
+use bevy::prelude::*;
 use dotent::project::script::Param;
 use enum_dispatch::enum_dispatch;
 use strum::{EnumDiscriminants, EnumString};
@@ -24,6 +27,7 @@ use crate::{
 use self::{
     _if::If,
     boolean_basic_operator::BooleanBasicOperator,
+    calc_basic::CalcBasic,
     change_variable::ChangeVariable,
     get_variable::GetVariable,
     length_of_string::LengthOfString,
@@ -31,6 +35,7 @@ use self::{
     move_x::MoveX,
     move_y::MoveY,
     repeat_basic::{RepeatBasic, RepeatBasicEnd},
+    repeat_inf::RepeatInf,
     set_variable::SetVariable,
     wait_second::WaitSecond,
 };
@@ -50,11 +55,13 @@ pub(crate) enum BlockEnum {
     SetVariable,
     GetVariable,
     ChangeVariable,
-    #[strum(serialize = "_if")]
+    #[strum_discriminants(strum(serialize = "_if"))]
     If,
     BooleanBasicOperator,
     MoveX,
     MoveY,
+    RepeatInf,
+    CalcBasic,
 }
 impl BlockType {
     pub(crate) fn build(&self, block: &dotent::project::script::Block) -> BlockVec {
@@ -63,6 +70,7 @@ impl BlockType {
             BlockType::WaitSecond => WaitSecond::build(block),
             BlockType::RepeatBasic => RepeatBasic::build(block),
             BlockType::RepeatBasicEnd => unreachable!(),
+            BlockType::RepeatInf => RepeatInf::build(block),
             BlockType::LengthOfString => LengthOfString::build(block),
             BlockType::SetVariable => SetVariable::build(block),
             BlockType::GetVariable => GetVariable::build(block),
@@ -71,6 +79,7 @@ impl BlockType {
             BlockType::BooleanBasicOperator => BooleanBasicOperator::build(block),
             BlockType::MoveX => MoveX::build(block),
             BlockType::MoveY => MoveY::build(block),
+            BlockType::CalcBasic => CalcBasic::build(block),
         }
     }
 }
@@ -111,6 +120,11 @@ impl Value {
     pub(crate) fn as_number_mut(&mut self) -> Result<&mut f32, &str> {
         match self {
             Self::Number(val) => Ok(val),
+            Self::String(val) => {
+                let new = val.parse::<f32>().or(Err("cannot convert as number"))?;
+                *self = Value::Number(new);
+                self.as_number_mut()
+            }
             _ => Err("cannot convert as mutable number"),
         }
     }
@@ -136,6 +150,15 @@ impl From<dotent::project::variable::Value> for Value {
         }
     }
 }
+
+pub(crate) fn parse_block(raw_block: &dotent::project::script::Block) -> BlockVec {
+    if let Ok(block_type) = BlockType::from_str(&raw_block.block_type) {
+        block_type.build(raw_block)
+    } else {
+        warn!("unsupported block: {}", raw_block.block_type);
+        Vec::new()
+    }
+}
 fn parse_param(param: &Param) -> Option<(Value, BlockVec)> {
     let mut blocks = Vec::new();
     let val = match param {
@@ -148,7 +171,8 @@ fn parse_param(param: &Param) -> Option<(Value, BlockVec)> {
             } else if LiteralBlockType::from_str(&block.block_type).is_ok() {
                 return parse_param(&block.params[0]);
             } else {
-                unreachable!()
+                warn!("unsupported block: {}", block.block_type);
+                return None;
             }
         }
         Param::Number(val) => Value::Number(*val),
@@ -163,9 +187,7 @@ fn parse_statements(script: &dotent::project::script::Script) -> Vec<BlockVec> {
     for code in script.0.iter() {
         let mut blocks = Vec::new();
         for block in code {
-            if let Ok(block_type) = BlockType::from_str(&block.block_type) {
-                blocks.append(&mut block_type.build(block));
-            }
+            blocks.append(&mut parse_block(block));
         }
         codes.push(blocks);
     }

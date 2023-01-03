@@ -3,7 +3,7 @@ use std::str::FromStr;
 use bevy::prelude::*;
 
 use crate::{
-    blocks::BlockType,
+    blocks::parse_block,
     code::{Code, Codes},
     common::{Id, Ids},
     event::EventType,
@@ -38,10 +38,7 @@ pub(crate) fn spawn_objects(
 
             let mut blocks = Vec::new();
             for raw_block in code.iter().skip(1) {
-                if let Ok(block_type) = BlockType::from_str(&raw_block.block_type) {
-                    let mut block = block_type.build(raw_block);
-                    blocks.append(&mut block);
-                }
+                blocks.append(&mut parse_block(raw_block));
             }
 
             codes.push(Code { event, blocks });
@@ -52,12 +49,10 @@ pub(crate) fn spawn_objects(
             None => "entrybot1.png".to_string(),
         };
 
-        info!("{}", texture);
-
         let id: Id = object.id.clone().into();
         let entity = commands
             .spawn(SpriteBundle {
-                texture: asset_server.load(&texture),
+                texture: asset_server.load(texture),
                 ..Default::default()
             })
             .insert(Object {
