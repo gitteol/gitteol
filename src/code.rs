@@ -6,6 +6,7 @@ use crate::{
     blocks::{Block, BlockVec, Value},
     common::{Id, Ids},
     event::EventType,
+    mouse::Mouse,
     object::Object,
     variable::Variable,
 };
@@ -68,11 +69,14 @@ impl CodeRunner {
     }
 }
 
-pub(crate) struct Context<'a, 'b, 'c, 'd> {
+pub(crate) struct Context<'a, 'b1, 'c1, 'd1, 'b2, 'c2, 'd2> {
     pub(crate) time: &'a Res<'a, Time>,
     pub(crate) ids: &'a Res<'a, Ids>,
-    pub(crate) object: &'a mut Object,
-    pub(crate) variables: &'a mut Query<'b, 'c, &'d mut Variable>,
+    // pub(crate) this: &'a mut Object,
+    pub(crate) owner: &'a Entity,
+    pub(crate) objects: &'a mut Query<'b1, 'c1, &'d1 mut Object>,
+    pub(crate) variables: &'a mut Query<'b2, 'c2, &'d2 mut Variable>,
+    pub(crate) mouse: &'a Res<'a, Mouse>,
 }
 
 #[derive(Resource)]
@@ -84,6 +88,7 @@ pub(crate) fn execute_code(
     ids: Res<Ids>,
     mut objects: Query<&mut Object>,
     mut variables: Query<&mut Variable>,
+    mouse: Res<Mouse>,
 ) {
     let mut new_queue: VecDeque<CodeRunner> = VecDeque::new();
 
@@ -97,13 +102,13 @@ pub(crate) fn execute_code(
 
         let owner_entity = ids.get(&owner).unwrap();
 
-        let mut this_object = objects.get_mut(*owner_entity).unwrap();
-
         let mut ctx = Context {
             time: &time,
             ids: &ids,
-            object: &mut this_object,
+            owner: owner_entity,
+            objects: &mut objects,
             variables: &mut variables,
+            mouse: &mouse,
         };
 
         while let Some(block) = code.get_mut(pointer) {
@@ -113,15 +118,15 @@ pub(crate) fn execute_code(
                 memory.insert(block.get_id(), "return_value", return_value);
             }
 
-            info!(
-                "OBJECT: {:?}, CODE: {}, POINTER: {} MEMORY: {:#?}",
-                owner_entity,
-                code.first()
-                    .map(|c| c.get_id().0.clone())
-                    .unwrap_or_else(|| "None".to_string()),
-                pointer,
-                memory.0
-            );
+            // info!(
+            //     "OBJECT: {:?}, CODE: {}, POINTER: {} MEMORY: {:#?}",
+            //     owner_entity,
+            //     code.first()
+            //         .map(|c| c.get_id().0.clone())
+            //         .unwrap_or_else(|| "None".to_string()),
+            //     pointer,
+            //     memory.0
+            // );
 
             if block_return.is_continue {
                 new_queue.push_back(CodeRunner {

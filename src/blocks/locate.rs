@@ -3,22 +3,22 @@ use crate::common::Id;
 use super::{parse_param, Block, BlockVec, Value};
 
 #[derive(Clone)]
-pub(crate) struct MoveX {
+pub(crate) struct Locate {
     id: Id,
-    amount: Value,
+    target: Value,
 }
 
-impl MoveX {
+impl Locate {
     pub(crate) fn build(block: &dotent::project::script::Block) -> BlockVec {
         let mut blocks = Vec::new();
 
-        let (amount, mut param_blocks) = parse_param(&block.params[0]).unwrap();
+        let (target, mut param_blocks) = parse_param(&block.params[0]).unwrap();
         blocks.append(&mut param_blocks);
 
         blocks.push(
-            MoveX {
+            Locate {
                 id: block.id.clone().into(),
-                amount,
+                target,
             }
             .into(),
         );
@@ -27,22 +27,33 @@ impl MoveX {
     }
 }
 
-impl Block for MoveX {
+impl Block for Locate {
     fn run(
         &self,
         pointer: usize,
         memory: &mut crate::code::Memory,
         ctx: &mut crate::code::Context,
     ) -> super::BlockReturn {
-        let amount = self
-            .amount
+        let target = self
+            .target
             .to_raw_value(memory)
             .unwrap()
-            .as_number()
+            .as_string()
             .unwrap();
 
+        let translation = match &target[..] {
+            "mouse" => ctx.mouse.pos,
+            _ => {
+                let id = Id::from_str(&target);
+                let entity = ctx.ids.get(&id).unwrap();
+                let target = ctx.objects.get(*entity).unwrap();
+                target.translation.truncate()
+            }
+        };
+
         let mut this = ctx.objects.get_mut(*ctx.owner).unwrap();
-        this.translation.x += amount;
+        this.translation.x = translation.x;
+        this.translation.y = translation.y;
 
         super::BlockReturn::basic(pointer)
     }

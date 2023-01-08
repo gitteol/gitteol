@@ -18,7 +18,9 @@ impl Block for MoveDirection {
             .unwrap()
             .as_number()
             .unwrap();
-        ctx.object.translation.x += amount;
+
+        let mut this = ctx.objects.get_mut(*ctx.owner).unwrap();
+        this.translation.x += amount;
 
         BlockReturn::basic(pointer)
     }

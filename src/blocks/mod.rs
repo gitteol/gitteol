@@ -3,8 +3,10 @@ mod boolean_basic_operator;
 mod calc_basic;
 mod calc_operation;
 mod change_variable;
+mod coordinate_object;
 mod get_variable;
 mod length_of_string;
+mod locate;
 mod locate_xy;
 mod move_direction;
 mod move_x;
@@ -15,7 +17,6 @@ mod repeat_basic;
 mod repeat_inf;
 mod set_variable;
 mod wait_second;
-mod coordinate_object;
 
 use std::str::FromStr;
 
@@ -35,8 +36,10 @@ use self::{
     calc_basic::CalcBasic,
     calc_operation::CalcOperation,
     change_variable::ChangeVariable,
+    coordinate_object::CoordinateObject,
     get_variable::GetVariable,
     length_of_string::LengthOfString,
+    locate::Locate,
     locate_xy::LocateXY,
     move_direction::MoveDirection,
     move_x::MoveX,
@@ -76,6 +79,7 @@ pub(crate) enum BlockEnum {
     CalcOperation,
     QuotientAndMod,
     CoordinateObject,
+    Locate,
 }
 impl BlockType {
     pub(crate) fn build(&self, block: &dotent::project::script::Block) -> BlockVec {
@@ -99,6 +103,7 @@ impl BlockType {
             BlockType::CalcOperation => CalcOperation::build(block),
             BlockType::QuotientAndMod => QuotientAndMod::build(block),
             BlockType::CoordinateObject => CoordinateObject::build(block),
+            BlockType::Locate => Locate::build(block),
         }
     }
 }

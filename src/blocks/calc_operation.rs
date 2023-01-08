@@ -55,9 +55,9 @@ impl Block for CalcOperation {
         let result = match &operator[..] {
             "square" => value.powi(2),
             "root" => value.sqrt(),
-            "sin" => value.to_radians().sin().to_degrees(),
-            "cos" => value.to_radians().cos().to_degrees(),
-            "tan" => value.to_radians().tan().to_degrees(),
+            "sin" => value.to_radians().sin(),
+            "cos" => value.to_radians().cos(),
+            "tan" => value.to_radians().tan(),
             "asin_radian" => value.asin().to_degrees(),
             "acos_radian" => value.acos().to_degrees(),
             "atan_radian" => value.atan().to_degrees(),

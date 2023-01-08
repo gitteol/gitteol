@@ -40,7 +40,10 @@ impl Block for MoveY {
             .unwrap()
             .as_number()
             .unwrap();
-        ctx.object.translation.y += amount;
+
+        let mut this = ctx.objects.get_mut(*ctx.owner).unwrap();
+
+        this.translation.y += amount;
 
         super::BlockReturn::basic(pointer)
     }

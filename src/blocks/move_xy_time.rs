@@ -50,6 +50,8 @@ impl Block for MoveXYTime {
         let x = self.x.to_raw_value(memory).unwrap().as_number().unwrap();
         let y = self.y.to_raw_value(memory).unwrap().as_number().unwrap();
 
+        let mut this = ctx.objects.get_mut(*ctx.owner).unwrap();
+
         let delta = memory
             .entry(&self.id, "delta")
             .or_insert(Value::Number(0.0))
@@ -61,8 +63,8 @@ impl Block for MoveXYTime {
         let new_delta = *delta + this_delta;
 
         if new_delta < 1.0 {
-            ctx.object.translation.x += this_delta * x;
-            ctx.object.translation.y += this_delta * y;
+            this.translation.x += this_delta * x;
+            this.translation.y += this_delta * y;
             *delta = new_delta;
             BlockReturn {
                 pointer,
@@ -71,10 +73,10 @@ impl Block for MoveXYTime {
             }
         } else {
             let this_delta = 1.0 - *delta;
-            ctx.object.translation.x += this_delta * x;
-            ctx.object.translation.y += this_delta * y;
+            this.translation.x += this_delta * x;
+            this.translation.y += this_delta * y;
 
-            info!("{:#?}", ctx.object.translation);
+            info!("{:#?}", this.translation);
 
             memory.remove(&self.id, "delta");
             BlockReturn::basic(pointer)

@@ -8,12 +8,14 @@ mod blocks;
 mod code;
 mod common;
 mod event;
+mod mouse;
 mod object;
 mod variable;
 
 use code::Queue;
 use common::Ids;
 use event::{Event, EventType};
+use mouse::Mouse;
 use object::spawn_objects;
 use variable::spawn_variable;
 
@@ -86,6 +88,7 @@ fn main() {
         .insert_resource(Queue(VecDeque::new()))
         .init_resource::<EntryFileData>()
         .insert_resource(Ids::new())
+        .insert_resource(Mouse::default())
         .add_plugins(DefaultPlugins.set(WindowPlugin {
             window: WindowDescriptor {
                 title: "깃털".to_string(),
@@ -106,7 +109,8 @@ fn main() {
             SystemSet::on_update(AppState::MainApp)
                 .with_system(event::event_listener)
                 .with_system(variable::variable_ui_system)
-                .with_system(object::object_system),
+                .with_system(object::object_system)
+                .with_system(mouse::mouse_system),
         )
         .add_system_set(
             SystemSet::on_update(AppState::MainApp)

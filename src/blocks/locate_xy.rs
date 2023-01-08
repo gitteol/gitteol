@@ -42,8 +42,10 @@ impl Block for LocateXY {
         let x = self.x.to_raw_value(memory).unwrap().as_number().unwrap();
         let y = self.y.to_raw_value(memory).unwrap().as_number().unwrap();
 
-        ctx.object.translation.x = x;
-        ctx.object.translation.y = y;
+        let mut this = ctx.objects.get_mut(*ctx.owner).unwrap();
+
+        this.translation.x = x;
+        this.translation.y = y;
 
         super::BlockReturn::basic(pointer)
     }
