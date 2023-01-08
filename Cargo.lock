@@ -1243,9 +1243,9 @@ checksum = "bd0c93bb4b0c6d9b77f4435b0ae98c24d17f1c45b2ff844c6151a07256ca923b"
 
 [[package]]
 name = "dotent"
-version = "0.2.6"
+version = "0.2.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d0645f553e76b84ec3837ca104210372165c5c70f3cb4845e850f28d16acdc92"
+checksum = "95e4a9b4d900acddda3ba3c0bd2ed8c2dcf613516ce29851299aed4fcda6636e"
 dependencies = [
  "flate2",
  "lazy_static",

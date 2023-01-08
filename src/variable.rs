@@ -8,7 +8,7 @@ use crate::{
 
 fn get_variable_color(variable_type: &VariableType) -> Color {
     match variable_type {
-        VariableType::Variable | VariableType::List => Color::rgb(0.36, 0.50, 0.97),
+        VariableType::Variable | VariableType::Slide | VariableType::List => Color::rgb(0.36, 0.50, 0.97),
         VariableType::Timer => Color::rgb(0.92, 0.70, 0.26),
         VariableType::Answer => Color::rgb(0.90, 0.51, 0.92),
     }

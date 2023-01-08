@@ -1,17 +1,21 @@
 mod _if;
 mod boolean_basic_operator;
 mod calc_basic;
+mod calc_operation;
 mod change_variable;
 mod get_variable;
 mod length_of_string;
+mod locate_xy;
 mod move_direction;
 mod move_x;
 mod move_xy_time;
 mod move_y;
+mod quotient_and_mod;
 mod repeat_basic;
 mod repeat_inf;
 mod set_variable;
 mod wait_second;
+mod coordinate_object;
 
 use std::str::FromStr;
 
@@ -29,13 +33,16 @@ use self::{
     _if::If,
     boolean_basic_operator::BooleanBasicOperator,
     calc_basic::CalcBasic,
+    calc_operation::CalcOperation,
     change_variable::ChangeVariable,
     get_variable::GetVariable,
     length_of_string::LengthOfString,
+    locate_xy::LocateXY,
     move_direction::MoveDirection,
     move_x::MoveX,
     move_xy_time::MoveXYTime,
     move_y::MoveY,
+    quotient_and_mod::QuotientAndMod,
     repeat_basic::{RepeatBasic, RepeatBasicEnd},
     repeat_inf::RepeatInf,
     set_variable::SetVariable,
@@ -65,6 +72,10 @@ pub(crate) enum BlockEnum {
     RepeatInf,
     CalcBasic,
     MoveXYTime,
+    LocateXY,
+    CalcOperation,
+    QuotientAndMod,
+    CoordinateObject,
 }
 impl BlockType {
     pub(crate) fn build(&self, block: &dotent::project::script::Block) -> BlockVec {
@@ -84,6 +95,10 @@ impl BlockType {
             BlockType::MoveY => MoveY::build(block),
             BlockType::CalcBasic => CalcBasic::build(block),
             BlockType::MoveXYTime => MoveXYTime::build(block),
+            BlockType::LocateXY => LocateXY::build(block),
+            BlockType::CalcOperation => CalcOperation::build(block),
+            BlockType::QuotientAndMod => QuotientAndMod::build(block),
+            BlockType::CoordinateObject => CoordinateObject::build(block),
         }
     }
 }
