@@ -39,8 +39,8 @@ impl Block for LocateXY {
         memory: &mut crate::code::Memory,
         ctx: &mut crate::code::Context,
     ) -> super::BlockReturn {
-        let x = self.x.to_raw_value(memory).unwrap().as_number().unwrap();
-        let y = self.y.to_raw_value(memory).unwrap().as_number().unwrap();
+        let x = self.x.take_raw_value(memory).unwrap().as_number().unwrap();
+        let y = self.y.take_raw_value(memory).unwrap().as_number().unwrap();
 
         let mut this = ctx.objects.get_mut(*ctx.owner).unwrap();
 

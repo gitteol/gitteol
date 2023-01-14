@@ -12,10 +12,8 @@ pub(crate) struct WaitSecond {
 }
 impl Block for WaitSecond {
     fn run(&self, pointer: usize, memory: &mut Memory, ctx: &mut Context) -> BlockReturn {
-        let second = self
-            .second
-            .to_raw_value(memory)
-            .unwrap()
+        let second = memory
+            .cache(&self.id, "second", &self.second)
             .as_number()
             .unwrap();
 
@@ -28,7 +26,7 @@ impl Block for WaitSecond {
         *delta += ctx.time.delta_seconds();
 
         if *delta >= second {
-            memory.remove(&self.id, "delta");
+            memory.remove_many(&self.id, &["delta", "second"]);
             BlockReturn {
                 pointer: pointer + 1,
                 is_continue: false,

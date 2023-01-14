@@ -50,6 +50,18 @@ impl Memory {
     pub(crate) fn remove(&mut self, block_id: &Id, label: &str) -> Option<Value> {
         self.0.remove(&Self::format_key(block_id, label))
     }
+
+    pub(crate) fn remove_many(&mut self, block_id: &Id, labels: &[&str]) {
+        for label in labels {
+            self.remove(block_id, label);
+        }
+    }
+
+    pub(crate) fn cache(&mut self, block_id: &Id, label: &str, value: &Value) -> &mut Value {
+        let val = value.take_raw_value(self);
+        let val = self.entry(block_id, label).or_insert_with(|| val.unwrap());
+        val
+    }
 }
 
 pub(crate) struct CodeRunner {
@@ -112,21 +124,34 @@ pub(crate) fn execute_code(
         };
 
         while let Some(block) = code.get_mut(pointer) {
+            let prev_pointer = pointer;
+
             let block_return = block.run(pointer, &mut memory, &mut ctx);
             pointer = block_return.pointer;
             if let Some(return_value) = block_return.return_value {
                 memory.insert(block.get_id(), "return_value", return_value);
             }
 
-            // info!(
-            //     "OBJECT: {:?}, CODE: {}, POINTER: {} MEMORY: {:#?}",
-            //     owner_entity,
-            //     code.first()
-            //         .map(|c| c.get_id().0.clone())
-            //         .unwrap_or_else(|| "None".to_string()),
-            //     pointer,
-            //     memory.0
-            // );
+            {
+                let block_name = block.to_string();
+                let block_id = block.get_id().clone().0;
+                let code_id = code
+                    .first()
+                    .map(|c| c.get_id().0.clone())
+                    .unwrap_or_else(|| "None".to_string());
+                let conti = if block_return.is_continue { "|" } else { "-" };
+                info!(
+                    "{:?}::{}::{}::{: <18} [{: >2} {}> {: >2}] Memory {:?}",
+                    owner_entity,
+                    code_id,
+                    block_id,
+                    block_name,
+                    prev_pointer,
+                    conti,
+                    pointer,
+                    memory.0
+                );
+            }
 
             if block_return.is_continue {
                 new_queue.push_back(CodeRunner {

@@ -13,10 +13,8 @@ pub(crate) struct RepeatBasic {
 }
 impl Block for RepeatBasic {
     fn run(&self, pointer: usize, memory: &mut Memory, _ctx: &mut Context) -> BlockReturn {
-        let iter_num = self
-            .iter_num
-            .to_raw_value(memory)
-            .unwrap()
+        let iter_num = memory
+            .cache(&self.id, "iter_num", &self.iter_num)
             .as_number()
             .unwrap();
         let count = memory
@@ -32,7 +30,7 @@ impl Block for RepeatBasic {
                 return_value: None,
             }
         } else {
-            memory.remove(&self.id, "count");
+            memory.remove_many(&self.id, &["count", "iter_num"]);
             BlockReturn {
                 pointer: pointer + self.statements_length + 2,
                 is_continue: false,

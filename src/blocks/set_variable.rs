@@ -14,11 +14,11 @@ pub(crate) struct SetVariable {
 impl Block for SetVariable {
     fn run(&self, pointer: usize, memory: &mut Memory, ctx: &mut Context) -> BlockReturn {
         let variable_entity = ctx.ids.get(&Id::from_str(&self.variable_id)).unwrap();
-        let value = self.value.to_raw_value(memory).unwrap();
+        let value = self.value.take_raw_value(memory).unwrap();
 
         let mut variable = ctx.variables.get_mut(*variable_entity).unwrap();
 
-        variable.value = value.clone();
+        variable.value = value;
 
         BlockReturn::basic(pointer)
     }

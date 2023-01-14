@@ -23,7 +23,7 @@ use std::str::FromStr;
 use bevy::prelude::*;
 use dotent::project::script::Param;
 use enum_dispatch::enum_dispatch;
-use strum::{EnumDiscriminants, EnumString};
+use strum::{Display, EnumDiscriminants, EnumString};
 
 use crate::{
     code::{Context, Memory},
@@ -53,7 +53,7 @@ use self::{
 };
 
 #[enum_dispatch]
-#[derive(Clone, EnumDiscriminants)]
+#[derive(Clone, EnumDiscriminants, Display)]
 #[strum_discriminants(derive(EnumString))]
 #[strum_discriminants(strum(serialize_all = "snake_case"))]
 #[strum_discriminants(name(BlockType))]
@@ -158,10 +158,18 @@ impl Value {
             _ => None,
         }
     }
+    #[allow(dead_code)]
     pub(crate) fn to_raw_value<'a>(&'a self, memory: &'a Memory) -> Option<&'a Value> {
         let mut value = Some(self);
         while let Some(Value::Memory((id, label))) = value {
             value = memory.get(id, label);
+        }
+        value
+    }
+    pub(crate) fn take_raw_value(&self, memory: &mut Memory) -> Option<Value> {
+        let mut value = Some(self.clone());
+        while let Some(Value::Memory((id, label))) = value {
+            value = memory.remove(&id, &label);
         }
         value
     }

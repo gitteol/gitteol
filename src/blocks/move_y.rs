@@ -36,7 +36,7 @@ impl Block for MoveY {
     ) -> super::BlockReturn {
         let amount = self
             .amount
-            .to_raw_value(memory)
+            .take_raw_value(memory)
             .unwrap()
             .as_number()
             .unwrap();

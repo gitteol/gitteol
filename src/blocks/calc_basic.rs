@@ -9,19 +9,18 @@ use super::{parse_param, Block, BlockReturn, BlockVec, Value};
 pub(crate) struct CalcBasic {
     id: Id,
     left: Value,
-    op: Value,
+    op: String,
     right: Value,
 }
 impl Block for CalcBasic {
     fn run(&self, pointer: usize, memory: &mut Memory, _ctx: &mut Context) -> BlockReturn {
-        let left = self.left.to_raw_value(memory).unwrap();
-        let op = self.op.to_raw_value(memory).unwrap().as_string().unwrap();
-        let right = self.right.to_raw_value(memory).unwrap();
+        let left = self.left.take_raw_value(memory).unwrap();
+        let right = self.right.take_raw_value(memory).unwrap();
 
         let left_as_num = left.as_number();
         let right_as_num = right.as_number();
 
-        let result = if (left_as_num.is_err() || right_as_num.is_err()) && op == "PLUS" {
+        let result = if (left_as_num.is_err() || right_as_num.is_err()) && self.op == "PLUS" {
             Value::String(format!(
                 "{}{}",
                 left.as_string().unwrap(),
@@ -31,7 +30,7 @@ impl Block for CalcBasic {
             let l = left_as_num.unwrap_or(0.0);
             let r = right_as_num.unwrap_or(0.0);
 
-            Value::Number(match &op[..] {
+            Value::Number(match &self.op[..] {
                 "PLUS" => l + r,
                 "MINUS" => l - r,
                 "MULTI" => l * r,
@@ -58,8 +57,8 @@ impl CalcBasic {
         let (left, mut param_blocks) = parse_param(&block.params[0]).unwrap();
         blocks.append(&mut param_blocks);
 
-        let (op, mut param_blocks) = parse_param(&block.params[1]).unwrap();
-        blocks.append(&mut param_blocks);
+        let (op, _) = parse_param(&block.params[1]).unwrap();
+        let op = op.as_string().unwrap();
 
         let (right, mut param_blocks) = parse_param(&block.params[2]).unwrap();
         blocks.append(&mut param_blocks);

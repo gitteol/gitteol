@@ -7,7 +7,7 @@ pub(crate) struct QuotientAndMod {
     id: Id,
     left: Value,
     right: Value,
-    operator: Value,
+    operator: String,
 }
 
 impl QuotientAndMod {
@@ -20,8 +20,8 @@ impl QuotientAndMod {
         let (right, mut param_blocks) = parse_param(&block.params[3]).unwrap();
         blocks.append(&mut param_blocks);
 
-        let (operator, mut param_blocks) = parse_param(&block.params[5]).unwrap();
-        blocks.append(&mut param_blocks);
+        let (operator, _) = parse_param(&block.params[5]).unwrap();
+        let operator = operator.as_string().unwrap();
 
         blocks.push(
             QuotientAndMod {
@@ -44,21 +44,20 @@ impl Block for QuotientAndMod {
         memory: &mut crate::code::Memory,
         _ctx: &mut crate::code::Context,
     ) -> super::BlockReturn {
-        let left = self.left.to_raw_value(memory).unwrap().as_number().unwrap();
-        let right = self
-            .right
-            .to_raw_value(memory)
+        let left = self
+            .left
+            .take_raw_value(memory)
             .unwrap()
             .as_number()
             .unwrap();
-        let operator = self
-            .operator
-            .to_raw_value(memory)
+        let right = self
+            .right
+            .take_raw_value(memory)
             .unwrap()
-            .as_string()
+            .as_number()
             .unwrap();
 
-        let result = match &operator[..] {
+        let result = match &self.operator[..] {
             "QUOTIENT" => (left / right).floor(),
             "MOD" => left % right,
             _ => unreachable!(),

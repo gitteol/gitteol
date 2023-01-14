@@ -14,7 +14,7 @@ impl Block for MoveDirection {
     fn run(&self, pointer: usize, memory: &mut Memory, ctx: &mut Context) -> BlockReturn {
         let amount = self
             .amount
-            .to_raw_value(memory)
+            .take_raw_value(memory)
             .unwrap()
             .as_number()
             .unwrap();

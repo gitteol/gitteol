@@ -1,5 +1,3 @@
-use bevy::prelude::info;
-
 use crate::common::Id;
 
 use super::{parse_param, Block, BlockReturn, BlockVec, Value};
@@ -46,9 +44,12 @@ impl Block for MoveXYTime {
         memory: &mut crate::code::Memory,
         ctx: &mut crate::code::Context,
     ) -> super::BlockReturn {
-        let time = self.time.to_raw_value(memory).unwrap().as_number().unwrap();
-        let x = self.x.to_raw_value(memory).unwrap().as_number().unwrap();
-        let y = self.y.to_raw_value(memory).unwrap().as_number().unwrap();
+        let time = memory
+            .cache(&self.id, "time", &self.time)
+            .as_number()
+            .unwrap();
+        let x = memory.cache(&self.id, "x", &self.x).as_number().unwrap();
+        let y = memory.cache(&self.id, "y", &self.y).as_number().unwrap();
 
         let mut this = ctx.objects.get_mut(*ctx.owner).unwrap();
 
@@ -76,9 +77,7 @@ impl Block for MoveXYTime {
             this.translation.x += this_delta * x;
             this.translation.y += this_delta * y;
 
-            info!("{:#?}", this.translation);
-
-            memory.remove(&self.id, "delta");
+            memory.remove_many(&self.id, &["delta", "time", "x", "y"]);
             BlockReturn::basic(pointer)
         }
     }

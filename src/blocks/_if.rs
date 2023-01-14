@@ -15,7 +15,7 @@ impl Block for If {
     fn run(&self, pointer: usize, memory: &mut Memory, _ctx: &mut Context) -> BlockReturn {
         let condition = self
             .condition
-            .to_raw_value(memory)
+            .take_raw_value(memory)
             .unwrap()
             .as_bool()
             .unwrap();

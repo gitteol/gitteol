@@ -6,7 +6,7 @@ use super::{parse_param, Block, BlockReturn, BlockVec, Value};
 pub(crate) struct CalcOperation {
     id: Id,
     value: Value,
-    operator: Value,
+    operator: String,
 }
 
 impl CalcOperation {
@@ -16,8 +16,8 @@ impl CalcOperation {
         let (value, mut param_blocks) = parse_param(&block.params[1]).unwrap();
         blocks.append(&mut param_blocks);
 
-        let (operator, mut param_blocks) = parse_param(&block.params[3]).unwrap();
-        blocks.append(&mut param_blocks);
+        let (operator, _) = parse_param(&block.params[3]).unwrap();
+        let operator = operator.as_string().unwrap();
 
         blocks.push(
             CalcOperation {
@@ -41,18 +41,12 @@ impl Block for CalcOperation {
     ) -> super::BlockReturn {
         let value = self
             .value
-            .to_raw_value(memory)
+            .take_raw_value(memory)
             .unwrap()
             .as_number()
             .unwrap();
-        let operator = self
-            .operator
-            .to_raw_value(memory)
-            .unwrap()
-            .as_string()
-            .unwrap();
 
-        let result = match &operator[..] {
+        let result = match &self.operator[..] {
             "square" => value.powi(2),
             "root" => value.sqrt(),
             "sin" => value.to_radians().sin(),

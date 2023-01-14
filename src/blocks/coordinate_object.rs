@@ -5,19 +5,19 @@ use super::{parse_param, Block, BlockReturn, BlockVec, Value};
 #[derive(Clone)]
 pub(crate) struct CoordinateObject {
     id: Id,
-    target: Value,
-    coordinate: Value,
+    target: String,
+    coordinate: String,
 }
 
 impl CoordinateObject {
     pub(crate) fn build(block: &dotent::project::script::Block) -> BlockVec {
         let mut blocks = Vec::new();
 
-        let (target, mut param_blocks) = parse_param(&block.params[1]).unwrap();
-        blocks.append(&mut param_blocks);
+        let (target, _) = parse_param(&block.params[1]).unwrap();
+        let target = target.as_string().unwrap();
 
-        let (coordinate, mut param_blocks) = parse_param(&block.params[3]).unwrap();
-        blocks.append(&mut param_blocks);
+        let (coordinate, _) = parse_param(&block.params[3]).unwrap();
+        let coordinate = coordinate.as_string().unwrap();
 
         blocks.push(
             CoordinateObject {
@@ -36,26 +36,16 @@ impl Block for CoordinateObject {
     fn run(
         &self,
         pointer: usize,
-        memory: &mut crate::code::Memory,
+        _memory: &mut crate::code::Memory,
         ctx: &mut crate::code::Context,
     ) -> super::BlockReturn {
-        let target = self
-            .target
-            .to_raw_value(memory)
-            .unwrap()
-            .as_string()
-            .unwrap();
-        let coordinate = self
-            .coordinate
-            .to_raw_value(memory)
-            .unwrap()
-            .as_string()
-            .unwrap();
+        let target = &self.target;
+        let coordinate = &self.coordinate;
 
         let target_entity = match &target[..] {
             "self" => ctx.owner,
             _ => {
-                let id = Id::from_str(&target);
+                let id = Id::from_str(target);
                 ctx.ids.get(&id).unwrap()
             }
         };

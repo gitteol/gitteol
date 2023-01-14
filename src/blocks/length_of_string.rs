@@ -14,7 +14,7 @@ impl Block for LengthOfString {
     fn run(&self, pointer: usize, memory: &mut Memory, _ctx: &mut Context) -> BlockReturn {
         let length = self
             .value
-            .to_raw_value(memory)
+            .take_raw_value(memory)
             .unwrap()
             .as_string()
             .unwrap()

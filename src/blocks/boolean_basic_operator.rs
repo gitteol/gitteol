@@ -9,17 +9,16 @@ use super::{parse_param, Block, BlockReturn, BlockVec, Value};
 pub(crate) struct BooleanBasicOperator {
     id: Id,
     left: Value,
-    op: Value,
+    op: String,
     right: Value,
 }
 impl Block for BooleanBasicOperator {
     fn run(&self, pointer: usize, memory: &mut Memory, _ctx: &mut Context) -> BlockReturn {
-        let left = self.left.to_raw_value(memory).unwrap();
-        let op = self.op.to_raw_value(memory).unwrap().as_string().unwrap();
-        let right = self.right.to_raw_value(memory).unwrap();
+        let left = self.left.take_raw_value(memory).unwrap();
+        let right = self.right.take_raw_value(memory).unwrap();
 
         let result = match (left.as_number(), right.as_number()) {
-            (Ok(l), Ok(r)) => match &op[..] {
+            (Ok(l), Ok(r)) => match &self.op[..] {
                 "EQUAL" => l == r,
                 "NOT_EQUAL" => l != r,
                 "GREATER" => l > r,
@@ -28,7 +27,7 @@ impl Block for BooleanBasicOperator {
                 "LESS_OR_EQUAL" => l <= r,
                 _ => unreachable!(),
             },
-            _ => match &op[..] {
+            _ => match &self.op[..] {
                 "EQUAL" => left.as_string().unwrap() == right.as_string().unwrap(),
                 "NOT_EQUAL" => left.as_string().unwrap() != right.as_string().unwrap(),
                 _ => false,
@@ -53,8 +52,8 @@ impl BooleanBasicOperator {
         let (left, mut param_blocks) = parse_param(&block.params[0]).unwrap();
         blocks.append(&mut param_blocks);
 
-        let (op, mut param_blocks) = parse_param(&block.params[1]).unwrap();
-        blocks.append(&mut param_blocks);
+        let (op, _) = parse_param(&block.params[1]).unwrap();
+        let op = op.as_string().unwrap();
 
         let (right, mut param_blocks) = parse_param(&block.params[2]).unwrap();
         blocks.append(&mut param_blocks);
