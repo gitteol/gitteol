@@ -26,6 +26,10 @@ jobs:
           ~/.cargo/git/db/
           target/
         key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+        
+    - name: Install OS deps
+      run: |
+        sudo apt-get install g++ pkg-config libx11-dev libasound2-dev libudev-dev
 
     - name: Build
       run: cargo build --verbose
@@ -37,7 +41,5 @@ jobs:
       run: cargo clippy --verbose
       
   rustdoc:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: gitteol/rustdoc/.github/workflows/rustdoc.yml@main
+    uses: gitteol/rustdoc/.github/workflows/rustdoc.yml@main
     
