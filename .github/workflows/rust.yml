@@ -40,6 +40,3 @@ jobs:
     - name: Run clippy
       run: cargo clippy --verbose
       
-  rustdoc:
-    uses: gitteol/rustdoc/.github/workflows/rustdoc.yml@main
-    
